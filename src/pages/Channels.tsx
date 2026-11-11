@@ -85,7 +85,7 @@ export function ChannelsPage({ favoritesOnly = false }: { favoritesOnly?: boolea
     return (
       <div className="p-6">
         <EmptyState icon={QueueListIcon} title="Aún no hay canales" text="Importa una lista M3U/M3U8 desde una URL o un archivo para empezar a explorar tus canales.">
-          <button onClick={() => navigate("/playlists")} className="inline-flex h-11 items-center gap-2 rounded-xl bg-accent px-5 text-sm font-medium text-white">
+          <button onClick={() => navigate("/playlists")} className="inline-flex h-11 items-center gap-2 rounded-[8px] grad-primary px-5 text-sm font-semibold text-white shadow-md shadow-accent/25 hover:brightness-110">
             <PlusIcon className="h-5 w-5" /> Añadir lista
           </button>
         </EmptyState>
@@ -166,13 +166,13 @@ export function ChannelsPage({ favoritesOnly = false }: { favoritesOnly?: boolea
             {(query || category !== "all" || group !== "all") && (
               <button
                 onClick={() => { setQuery(""); setCategory("all"); setGroup("all"); }}
-                className="h-10 rounded-xl border border-line bg-surface2 px-4 text-sm hover:border-accent/50"
+                className="h-10 rounded-[8px] border border-line bg-surface px-4 text-sm font-medium transition-colors hover:border-accent/50"
               >
                 Limpiar filtros
               </button>
             )}
             {favoritesOnly && !query && (
-              <button onClick={() => navigate("/channels")} className="h-10 rounded-xl bg-accent px-4 text-sm font-medium text-white">
+              <button onClick={() => navigate("/channels")} className="h-10 rounded-[8px] grad-primary px-4 text-sm font-semibold text-white shadow-md shadow-accent/25 hover:brightness-110">
                 Explorar canales
               </button>
             )}
@@ -206,8 +206,10 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       aria-selected={active}
       onClick={onClick}
       className={cn(
-        "inline-flex h-8 shrink-0 items-center gap-2 rounded-full border px-3.5 text-xs font-medium transition-all duration-200",
-        active ? "border-transparent bg-accent text-white shadow-md shadow-accent/30" : "border-line bg-surface text-mute hover:border-accent/50 hover:text-ink",
+        "inline-flex h-8 shrink-0 items-center gap-2 rounded-full border px-3.5 text-xs font-semibold transition-all duration-200",
+        active
+          ? "border-transparent grad-primary text-white shadow-md shadow-accent/30"
+          : "border-line bg-surface text-mute hover:border-accent/50 hover:text-ink",
       )}
     >
       {children}

@@ -498,7 +498,7 @@ export function Player({ channel, onNext, onPrev, className }: Props) {
           aria-label="Reproducir"
           className="absolute inset-0 grid place-items-center bg-black/40"
         >
-          <span className="grid h-20 w-20 place-items-center rounded-full bg-accent text-white shadow-2xl shadow-accent/50 transition-transform hover:scale-110">
+          <span className="grid h-20 w-20 place-items-center rounded-full grad-primary-br text-white shadow-2xl shadow-accent/50 transition-transform hover:scale-110">
             <PlayIcon className="h-10 w-10 translate-x-0.5" />
           </span>
         </button>
@@ -508,7 +508,7 @@ export function Player({ channel, onNext, onPrev, className }: Props) {
       {channel && status === "error" && error && (
         <div data-controls className="absolute inset-0 grid place-items-center bg-black/80 p-6 text-center backdrop-blur-sm anim-fade-up">
           <div className="max-w-md text-white">
-            <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-red-500/15 text-red-400">
+            <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-[10px] bg-red-500/15 text-red-400">
               {error.kind === "unsupported" ? <ExclamationTriangleIcon className="h-8 w-8" /> : <SignalSlashIcon className="h-8 w-8" />}
             </div>
             <h3 className="text-lg font-semibold">
@@ -517,12 +517,12 @@ export function Player({ channel, onNext, onPrev, className }: Props) {
             <p className="mt-2 text-sm text-white/70">{error.message}</p>
             {!navigator.onLine && <p className="mt-2 text-sm text-amber-300">Parece que no tienes conexión a Internet.</p>}
             <div className="mt-5 flex flex-wrap justify-center gap-3">
-              <button onClick={retry} className="inline-flex h-10 items-center gap-2 rounded-xl bg-accent px-4 text-sm font-medium text-white hover:brightness-110">
+              <button onClick={retry} className="inline-flex h-10 items-center gap-2 rounded-[8px] grad-primary px-4 text-sm font-semibold text-white shadow-md shadow-accent/25 hover:brightness-110">
                 <ArrowPathIcon className="h-5 w-5" />
                 Reintentar
               </button>
               {onNext && (
-                <button onClick={onNext} className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/20 px-4 text-sm font-medium text-white hover:bg-white/10">
+                <button onClick={onNext} className="inline-flex h-10 items-center gap-2 rounded-[8px] border border-white/20 px-4 text-sm font-medium text-white hover:bg-white/10">
                   <ForwardIcon className="h-5 w-5" />
                   Siguiente canal
                 </button>
@@ -564,7 +564,7 @@ export function Player({ channel, onNext, onPrev, className }: Props) {
 
       {/* Ayuda de atajos */}
       {menu === "help" && (
-        <div data-controls className="absolute right-3 top-16 z-10 w-72 rounded-2xl border border-white/10 bg-black/85 p-4 text-white shadow-2xl backdrop-blur anim-fade-up">
+        <div data-controls className="absolute right-3 top-16 z-10 w-72 rounded-[10px] border border-white/10 bg-black/85 p-4 text-white shadow-2xl backdrop-blur anim-fade-up">
           <p className="mb-2 text-sm font-semibold">Atajos de teclado</p>
           <dl className="space-y-1.5 text-xs">
             {SHORTCUTS.map(([k, d]) => (
@@ -710,7 +710,7 @@ function CtrlBtn({
       aria-label={label}
       title={label}
       className={cn(
-        "grid shrink-0 place-items-center rounded-lg text-white/90 transition-all duration-150 hover:bg-white/15 hover:text-white active:scale-90",
+        "grid shrink-0 place-items-center rounded-[8px] text-white/90 transition-all duration-150 hover:bg-white/15 hover:text-white active:scale-90",
         big ? "h-10 w-10 sm:h-11 sm:w-11" : "h-9 w-9",
         active && "bg-white/15 text-accent2",
         className,
@@ -723,7 +723,7 @@ function CtrlBtn({
 
 function Popover({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="absolute bottom-12 right-0 z-10 min-w-44 rounded-2xl border border-white/10 bg-black/90 p-1.5 shadow-2xl backdrop-blur anim-fade-up">
+    <div className="absolute bottom-12 right-0 z-10 min-w-44 rounded-[10px] border border-white/10 bg-black/90 p-1.5 shadow-2xl backdrop-blur anim-fade-up">
       <p className="px-3 pb-1 pt-1.5 text-[11px] uppercase tracking-wider text-white/50">{title}</p>
       {children}
     </div>
@@ -735,7 +735,7 @@ function PopItem({ active, onClick, children }: { active: boolean; onClick: () =
     <button
       onClick={onClick}
       className={cn(
-        "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10",
+        "flex w-full items-center justify-between rounded-[6px] px-3 py-2 text-left text-sm transition-colors hover:bg-white/10",
         active ? "text-accent2" : "text-white",
       )}
     >

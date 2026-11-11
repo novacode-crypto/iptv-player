@@ -24,7 +24,7 @@ export function RecentsPage() {
 
       {items.length === 0 ? (
         <EmptyState icon={ClockIcon} title="Todavía no has visto nada" text="Los canales que reproduzcas aparecerán aquí con la fecha y hora de su última reproducción.">
-          <button onClick={() => navigate("/channels")} className="h-10 rounded-xl bg-accent px-4 text-sm font-medium text-white">
+          <button onClick={() => navigate("/channels")} className="h-10 rounded-[8px] grad-primary px-4 text-sm font-semibold text-white shadow-md shadow-accent/25 hover:brightness-110">
             Explorar canales
           </button>
         </EmptyState>
@@ -33,14 +33,14 @@ export function RecentsPage() {
           {items.map(({ h, ch }) => (
             <li
               key={h.id}
-              className="group flex items-center gap-3 rounded-2xl border border-line bg-surface p-3 transition-all duration-200 hover:border-accent/50 anim-fade-up"
+              className="group flex items-center gap-3 rounded-[10px] border border-line bg-surface p-3 shadow-xs transition-all duration-200 hover:border-accent/50 hover:shadow-card anim-fade-up"
             >
               <button
                 disabled={!ch}
                 onClick={() => ch && play(ch.id)}
                 className="flex min-w-0 flex-1 items-center gap-3 text-left disabled:opacity-50"
               >
-                <ChannelLogo name={h.name} logo={ch?.logo ?? h.logo} className="h-12 w-[72px] shrink-0 rounded-xl" imgClassName="p-1.5" />
+                <ChannelLogo name={h.name} logo={ch?.logo ?? h.logo} className="h-12 w-[72px] shrink-0 rounded-[8px]" imgClassName="p-1.5" />
                 <div className="min-w-0">
                   <p className="truncate font-medium">{h.name}</p>
                   <p className="truncate text-xs text-mute">

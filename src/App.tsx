@@ -18,7 +18,7 @@ function useTheme() {
     const apply = () => {
       const resolved = theme === "system" ? (mq.matches ? "dark" : "light") : theme;
       document.documentElement.dataset.theme = resolved;
-      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#090D16" : "#F1F5F9");
+      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#141029" : "#ECE8F9");
     };
     apply();
     if (theme === "system") {
@@ -49,13 +49,13 @@ export default function App() {
   const fill = route === "/channels" || route === "/favorites";
 
   return (
-    <div className="flex h-full bg-bg text-ink">
+    <div className="flex h-full flex-col bg-transparent md:flex-row md:gap-3 md:p-3">
       <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col md:gap-3">
         <Header />
         <OfflineBanner />
-        <main className={fill ? "min-h-0 flex-1 overflow-hidden" : "min-h-0 flex-1 overflow-y-auto"} key={fill ? "fill" : route}>
-          <div className={fill ? "h-full" : "min-h-full anim-fade-up"}>
+        <main className={fill ? "min-h-0 flex-1 overflow-hidden" : "min-h-0 flex-1 overflow-y-auto md:rounded-[10px]"} key={fill ? "fill" : route}>
+          <div className={fill ? "h-full min-h-0" : "min-h-full anim-fade-up"}>
             {route === "/" && <HomePage />}
             {route === "/channels" && <ChannelsPage />}
             {route === "/favorites" && <ChannelsPage favoritesOnly />}

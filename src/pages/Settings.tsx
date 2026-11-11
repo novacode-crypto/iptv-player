@@ -16,16 +16,17 @@ import { Button, ConfirmButton, PageHeader, Segmented, Select, Toggle, type Icon
 import { useStore } from "@/lib/store";
 import type { Density, FullscreenMode, QualityPref, ThemeMode } from "@/lib/types";
 import { formatBytes } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
-function Section({ icon: Icon, title, desc, children }: { icon: IconType; title: string; desc?: string; children: ReactNode }) {
+function Section({ icon: Icon, tile, title, desc, children }: { icon: IconType; tile: string; title: string; desc?: string; children: ReactNode }) {
   return (
-    <section className="rounded-3xl border border-line bg-surface p-5 shadow-card sm:p-6">
+    <section className="rounded-[10px] border border-line bg-surface p-5 shadow-card sm:p-6">
       <div className="mb-2 flex items-center gap-3">
-        <span className="grid h-10 w-10 place-items-center rounded-xl bg-accent/15 text-accent">
+        <span className={cn("grid h-10 w-10 place-items-center rounded-[8px] text-white shadow-sm", tile)}>
           <Icon className="h-5 w-5" />
         </span>
         <div>
-          <h2 className="text-lg font-semibold">{title}</h2>
+          <h2 className="text-lg font-bold">{title}</h2>
           {desc && <p className="text-xs text-mute">{desc}</p>}
         </div>
       </div>
@@ -69,8 +70,8 @@ export function SettingsPage() {
     <div className="mx-auto max-w-3xl space-y-5 p-4 pb-24 sm:p-6 md:pb-8">
       <PageHeader title="Configuración" subtitle="Todas las preferencias se guardan automáticamente en tu dispositivo." />
 
-      <Section icon={SparklesIcon} title="Apariencia">
-        <Row title="Tema" desc="El tema oscuro es el predeterminado.">
+      <Section icon={SparklesIcon} tile="bg-accent" title="Apariencia">
+        <Row title="Tema" desc="El tema claro reproduce el estilo del panel; el oscuro es su versión nocturna.">
           <Segmented<ThemeMode>
             value={settings.theme}
             onChange={(theme) => set({ theme })}
@@ -97,7 +98,7 @@ export function SettingsPage() {
         </Row>
       </Section>
 
-      <Section icon={PlayIcon} title="Reproductor">
+      <Section icon={PlayIcon} tile="bg-brand-blue" title="Reproductor">
         <Row title="Reproducción automática" desc="Empieza a reproducir al seleccionar un canal.">
           <Toggle checked={settings.autoplay} onChange={(autoplay) => set({ autoplay })} label="Reproducción automática" />
         </Row>
@@ -154,7 +155,7 @@ export function SettingsPage() {
         </Row>
       </Section>
 
-      <Section icon={CircleStackIcon} title="Datos" desc="Copias de seguridad en formato JSON y gestión del almacenamiento local.">
+      <Section icon={CircleStackIcon} tile="bg-brand-yellow" title="Datos" desc="Copias de seguridad en formato JSON y gestión del almacenamiento local.">
         <Row title="Exportar información" desc="Configuración, listas con sus canales, o una copia completa (incluye favoritos e historial).">
           <Button size="sm" icon={ArrowDownTrayIcon} onClick={() => void exportBackup("config")}>
             Configuración
@@ -183,7 +184,7 @@ export function SettingsPage() {
           />
         </Row>
         {pending && (
-          <div className="my-3 rounded-2xl border border-accent/40 bg-accent/5 p-4 anim-fade-up">
+          <div className="my-3 rounded-[8px] border border-accent/40 bg-accent/5 p-4 anim-fade-up">
             <p className="text-sm font-medium">Restaurar «{pending.name}»</p>
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <Segmented<"merge" | "replace">
@@ -211,7 +212,7 @@ export function SettingsPage() {
                 Cancelar
               </Button>
             </div>
-            {mode === "replace" && <p className="mt-2 text-xs text-amber-400">Se eliminarán antes todos los datos actuales.</p>}
+            {mode === "replace" && <p className="mt-2 text-xs text-amber-600">Se eliminarán antes todos los datos actuales.</p>}
           </div>
         )}
         <Row title="Limpiar historial" desc={`${nHistory} ${nHistory === 1 ? "entrada" : "entradas"} guardadas.`}>
@@ -229,7 +230,7 @@ export function SettingsPage() {
         )}
       </Section>
 
-      <Section icon={ShieldCheckIcon} title="Privacidad y uso responsable">
+      <Section icon={ShieldCheckIcon} tile="bg-brand-teal" title="Privacidad y uso responsable">
         <div className="space-y-2 py-4 text-sm text-mute">
           <p>NEXA IPTV funciona íntegramente en tu navegador: no hay cuentas, telemetría ni servidores propios. Tus listas se guardan solo en IndexedDB de este dispositivo.</p>
           <p>La aplicación no incluye canales ni contenido. Eres responsable de utilizar únicamente fuentes que tengas autorización para reproducir.</p>

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CheckCircleIcon,
   ChevronLeftIcon,
@@ -10,10 +10,12 @@ import {
   HomeIcon,
   InformationCircleIcon,
   MagnifyingGlassIcon,
+  MoonIcon,
   QueueListIcon,
   SignalIcon,
   SignalSlashIcon,
   Squares2X2Icon,
+  SunIcon,
   TvIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -22,27 +24,33 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
 import { IconButton, Spinner, type IconType } from "./ui";
 
-const NAV: { route: Route; label: string; icon: IconType; badge?: "channels" | "favorites" | "playlists" }[] = [
-  { route: "/", label: "Inicio", icon: HomeIcon },
-  { route: "/channels", label: "Todos los canales", icon: Squares2X2Icon, badge: "channels" },
-  { route: "/favorites", label: "Favoritos", icon: HeartIcon, badge: "favorites" },
-  { route: "/recents", label: "Recientes", icon: ClockIcon },
-  { route: "/playlists", label: "Listas IPTV", icon: QueueListIcon, badge: "playlists" },
-  { route: "/settings", label: "Configuración", icon: Cog6ToothIcon },
+/** Cada sección lleva su icono de color, como el panel de referencia */
+const NAV: { route: Route; label: string; icon: IconType; tile: string; badge?: "channels" | "favorites" | "playlists" }[] = [
+  { route: "/", label: "Inicio", icon: HomeIcon, tile: "bg-accent" },
+  { route: "/channels", label: "Canales", icon: Squares2X2Icon, tile: "bg-brand-blue", badge: "channels" },
+  { route: "/favorites", label: "Favoritos", icon: HeartIcon, tile: "bg-brand-pink", badge: "favorites" },
+  { route: "/recents", label: "Recientes", icon: ClockIcon, tile: "bg-brand-teal" },
+  { route: "/playlists", label: "Listas IPTV", icon: QueueListIcon, tile: "bg-brand-yellow", badge: "playlists" },
+  { route: "/settings", label: "Ajustes", icon: Cog6ToothIcon, tile: "bg-white/15" },
 ];
 
-export function Logo({ collapsed }: { collapsed?: boolean }) {
+export function Logo({ collapsed, dark = true }: { collapsed?: boolean; dark?: boolean }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-accent to-accent2 text-white shadow-lg shadow-accent/30">
+      <div
+        className={cn(
+          "grid h-10 w-10 shrink-0 place-items-center rounded-[10px] grad-primary-br text-white shadow-lg shadow-black/20",
+          dark && "shadow-accent/30",
+        )}
+      >
         <TvIcon className="h-6 w-6" />
       </div>
       {!collapsed && (
         <div className="leading-none">
-          <div className="text-lg font-extrabold tracking-wide">
-            NEXA <span className="gradient-text">IPTV</span>
+          <div className={cn("text-lg font-extrabold tracking-wide", dark ? "text-white" : "text-ink")}>
+            NEXA <span className={dark ? "text-accent2" : "gradient-text"}>IPTV</span>
           </div>
-          <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-mute">Tu centro multimedia</div>
+          <div className={cn("mt-1 text-[10px] font-medium uppercase tracking-[0.18em]", dark ? "text-side-mute" : "text-mute")}>Tu centro multimedia</div>
         </div>
       )}
     </div>
@@ -61,13 +69,14 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "relative hidden shrink-0 flex-col border-r border-line bg-surface/70 backdrop-blur transition-[width] duration-300 md:flex",
+        "sidebar-bg relative hidden shrink-0 flex-col overflow-hidden rounded-[10px] text-white shadow-card transition-[width] duration-300 md:flex",
         collapsed ? "w-[76px]" : "w-64",
       )}
     >
-      <div className={cn("flex h-16 items-center border-b border-line", collapsed ? "justify-center" : "px-5")}>
+      <div className={cn("flex h-16 shrink-0 items-center border-b border-white/10", collapsed ? "justify-center" : "px-4")}>
         <Logo collapsed={collapsed} />
       </div>
+
       <nav className="flex-1 space-y-1 overflow-y-auto p-3" aria-label="Navegación principal">
         {NAV.map((n) => {
           const active = route === n.route;
@@ -79,26 +88,50 @@ export function Sidebar() {
               title={n.label}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "group relative flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium transition-all duration-200",
+                "group relative flex h-11 w-full items-center gap-3 rounded-[8px] px-2 transition-all duration-200",
                 collapsed && "justify-center px-0",
-                active ? "bg-gradient-to-r from-accent/25 to-accent2/10 text-ink" : "text-mute hover:bg-ink/5 hover:text-ink",
+                active ? "bg-white/12" : "hover:bg-white/8",
               )}
             >
-              {active && <span className="absolute left-0 h-6 w-1 rounded-r-full bg-accent" />}
-              <n.icon className={cn("h-5 w-5 shrink-0", active && "text-accent2")} />
-              {!collapsed && <span className="flex-1 truncate text-left">{n.label}</span>}
+              <span
+                className={cn(
+                  "grid h-8 w-8 shrink-0 place-items-center rounded-[8px] text-white shadow-sm transition-colors duration-200",
+                  active ? "bg-white text-accent" : n.tile,
+                )}
+              >
+                <n.icon className="h-[18px] w-[18px]" />
+              </span>
+              {!collapsed && <span className="flex-1 truncate text-left text-sm font-medium text-side-ink/95">{n.label}</span>}
               {!collapsed && count > 0 && (
-                <span className="rounded-full bg-ink/10 px-2 py-0.5 text-[11px] text-mute">{count.toLocaleString("es-ES")}</span>
+                <span className="rounded-full bg-white/15 px-2 py-0.5 text-[11px] font-medium text-side-mute">{count.toLocaleString("es-ES")}</span>
               )}
+              {!collapsed && <ChevronRightIcon className="h-3.5 w-3.5 text-side-mute/60 transition-transform duration-200 group-hover:translate-x-0.5" />}
             </button>
           );
         })}
       </nav>
-      <div className="border-t border-line p-3">
+
+      {/* Perfil: la app es privada y local, sin cuenta */}
+      <div className="shrink-0 border-t border-white/10 p-3">
+        <div className={cn("flex items-center gap-3 rounded-[8px] p-1.5", collapsed && "justify-center")}>
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-accent to-brand-teal text-xs font-bold text-white shadow-md">
+            NX
+          </div>
+          {!collapsed && (
+            <div className="min-w-0 leading-tight">
+              <p className="truncate text-sm font-semibold text-white">Espectador local</p>
+              <p className="truncate text-xs text-side-mute">Privado · sin cuenta</p>
+            </div>
+          )}
+        </div>
         <button
           onClick={() => setMeta({ sidebarCollapsed: !collapsed })}
           aria-label={collapsed ? "Expandir barra lateral" : "Contraer barra lateral"}
-          className="flex h-10 w-full items-center justify-center gap-2 rounded-xl text-xs text-mute transition-colors hover:bg-ink/5 hover:text-ink"
+          title={collapsed ? "Expandir barra lateral" : "Contraer barra lateral"}
+          className={cn(
+            "mt-2 flex h-10 w-full items-center justify-center gap-2 rounded-[8px] bg-white/8 text-sm font-medium text-white/90 transition-colors hover:bg-white/15",
+            collapsed && "px-0",
+          )}
         >
           {collapsed ? <ChevronRightIcon className="h-5 w-5" /> : <ChevronLeftIcon className="h-5 w-5" />}
           {!collapsed && "Contraer"}
@@ -124,14 +157,67 @@ export function MobileNav() {
             onClick={() => navigate(n.route)}
             aria-label={n.label}
             aria-current={active ? "page" : undefined}
-            className={cn("flex h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[10px] transition-colors", active ? "text-accent2" : "text-mute")}
+            className={cn(
+              "relative flex h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors",
+              active ? "text-accent" : "text-mute",
+            )}
           >
-            <n.icon className="h-5 w-5" />
+            {active && <span className="absolute top-0 h-[3px] w-8 rounded-b-full grad-primary" />}
+            <n.icon className={cn("h-5 w-5", active && "text-accent")} />
             <span className="max-w-full truncate px-0.5">{n.label.replace("Todos los canales", "Canales").replace("Listas IPTV", "Listas").replace("Configuración", "Ajustes")}</span>
           </button>
         );
       })}
     </nav>
+  );
+}
+
+/** Resuelve si el tema efectivo actual es oscuro (configuración o sistema) */
+function useResolvedDark() {
+  const theme = useStore((s) => s.settings.theme);
+  const [sysDark, setSysDark] = useState(() =>
+    typeof window === "undefined" ? false : window.matchMedia("(prefers-color-scheme: dark)").matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const fn = () => setSysDark(mq.matches);
+    mq.addEventListener("change", fn);
+    return () => mq.removeEventListener("change", fn);
+  }, []);
+  return theme === "dark" || (theme === "system" && sysDark);
+}
+
+/** Conmutador de tema sol/luna, al estilo de los controles segmentados del panel */
+export function ThemeToggle() {
+  const dark = useResolvedDark();
+  const setSettings = useStore((s) => s.setSettings);
+  return (
+    <div className="inline-flex shrink-0 rounded-full border border-line bg-surface2 p-0.5" role="group" aria-label="Cambiar tema">
+      <button
+        onClick={() => setSettings({ theme: "light" })}
+        aria-label="Tema claro"
+        aria-pressed={!dark}
+        title="Tema claro"
+        className={cn(
+          "grid h-7 w-8 place-items-center rounded-full transition-all duration-200",
+          !dark ? "grad-primary text-white shadow-sm shadow-accent/30" : "text-mute hover:text-ink",
+        )}
+      >
+        <SunIcon className="h-4 w-4" />
+      </button>
+      <button
+        onClick={() => setSettings({ theme: "dark" })}
+        aria-label="Tema oscuro"
+        aria-pressed={dark}
+        title="Tema oscuro"
+        className={cn(
+          "grid h-7 w-8 place-items-center rounded-full transition-all duration-200",
+          dark ? "grad-primary text-white shadow-sm shadow-accent/30" : "text-mute hover:text-ink",
+        )}
+      >
+        <MoonIcon className="h-4 w-4" />
+      </button>
+    </div>
   );
 }
 
@@ -166,9 +252,9 @@ export function Header() {
   };
 
   return (
-    <header className="z-20 flex h-16 shrink-0 items-center gap-2 border-b border-line bg-bg/80 px-3 backdrop-blur sm:gap-3 sm:px-6">
+    <header className="z-20 flex h-16 shrink-0 items-center gap-2 border-b border-line bg-surface px-3 sm:gap-3 sm:px-5 md:rounded-[10px] md:border-none md:shadow-card">
       <div className="mr-1 md:hidden">
-        <Logo collapsed />
+        <Logo collapsed dark={false} />
       </div>
       <div className="relative min-w-0 flex-1 sm:max-w-xl">
         <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-mute" />
@@ -178,14 +264,14 @@ export function Header() {
           onChange={(e) => onChange(e.target.value)}
           placeholder="Buscar canales, categorías, tvg-id…"
           aria-label="Buscar canales"
-          className="h-10 w-full rounded-xl border border-line bg-surface pl-10 pr-16 text-sm outline-none transition-colors placeholder:text-mute focus:border-accent"
+          className="h-10 w-full rounded-[8px] border border-transparent bg-surface2 pl-10 pr-16 text-sm outline-none transition-all placeholder:text-mute focus:border-accent focus:bg-surface"
         />
         {query ? (
-          <button onClick={() => setQuery("")} aria-label="Borrar búsqueda" className="absolute right-2 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-md text-mute hover:text-ink">
+          <button onClick={() => setQuery("")} aria-label="Borrar búsqueda" className="absolute right-2 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-[6px] text-mute hover:text-ink">
             <XMarkIcon className="h-4 w-4" />
           </button>
         ) : (
-          <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-line px-1.5 py-0.5 text-[10px] text-mute sm:block">Ctrl K</kbd>
+          <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-[6px] border border-line bg-surface px-1.5 py-0.5 text-[10px] text-mute sm:block">Ctrl K</kbd>
         )}
       </div>
 
@@ -194,7 +280,7 @@ export function Header() {
           aria-label="Lista activa"
           value={active}
           onChange={(e) => setMeta({ activePlaylist: e.target.value })}
-          className="h-10 w-24 shrink-0 rounded-xl border border-line bg-surface px-2 text-sm outline-none hover:border-accent/50 focus:border-accent sm:w-52 sm:px-3"
+          className="hidden h-10 w-40 shrink-0 rounded-[8px] border border-line bg-surface2 px-2 text-sm outline-none transition-colors hover:border-accent/50 focus:border-accent sm:block sm:w-48 sm:px-3"
         >
           <option value="all">Todas las listas</option>
           {playlists
@@ -209,14 +295,18 @@ export function Header() {
 
       <div
         className={cn(
-          "hidden h-10 shrink-0 items-center gap-2 rounded-xl border px-3 text-xs font-medium lg:flex",
-          online ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" : "border-red-500/30 bg-red-500/10 text-red-400",
+          "hidden h-10 shrink-0 items-center gap-2 rounded-full border px-3.5 text-xs font-semibold lg:flex",
+          online
+            ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-600"
+            : "border-red-500/25 bg-red-500/10 text-red-500",
         )}
         role="status"
       >
         {importing ? <Spinner className="h-4 w-4" /> : online ? <SignalIcon className="h-4 w-4" /> : <SignalSlashIcon className="h-4 w-4" />}
         {importing ? "Importando…" : online ? "En línea" : "Sin conexión"}
       </div>
+
+      <ThemeToggle />
       <IconButton icon={Cog6ToothIcon} label="Configuración" onClick={() => navigate("/settings")} className="hidden sm:grid" />
     </header>
   );
@@ -226,7 +316,7 @@ export function OfflineBanner() {
   const online = useStore((s) => s.online);
   if (online) return null;
   return (
-    <div className="flex items-center gap-2 border-b border-red-500/30 bg-red-500/10 px-6 py-2 text-sm text-red-300 anim-fade-up" role="alert">
+    <div className="flex items-center gap-2 rounded-[8px] border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-500 anim-fade-up md:mt-3" role="alert">
       <SignalSlashIcon className="h-5 w-5 shrink-0" />
       Sin conexión a Internet. Tus listas guardadas siguen disponibles, pero la reproducción y las actualizaciones requieren red.
     </div>
@@ -244,13 +334,20 @@ export function Toasts() {
           <div
             key={t.id}
             className={cn(
-              "pointer-events-auto flex items-start gap-3 rounded-2xl border bg-surface2/95 p-3.5 pr-2 shadow-2xl backdrop-blur anim-toast",
+              "pointer-events-auto flex items-start gap-3 rounded-[10px] border bg-surface p-3.5 pr-2 shadow-2xl anim-toast",
               t.kind === "success" && "border-emerald-500/40",
               t.kind === "error" && "border-red-500/40",
-              t.kind === "info" && "border-accent2/40",
+              t.kind === "info" && "border-accent/40",
             )}
           >
-            <Icon className={cn("mt-0.5 h-5 w-5 shrink-0", t.kind === "success" && "text-emerald-400", t.kind === "error" && "text-red-400", t.kind === "info" && "text-accent2")} />
+            <Icon
+              className={cn(
+                "mt-0.5 h-5 w-5 shrink-0",
+                t.kind === "success" && "text-emerald-500",
+                t.kind === "error" && "text-red-500",
+                t.kind === "info" && "text-accent",
+              )}
+            />
             <p className="flex-1 text-sm leading-snug">{t.message}</p>
             <IconButton icon={XMarkIcon} label="Cerrar notificación" onClick={() => dismiss(t.id)} className="h-7 w-7" />
           </div>
