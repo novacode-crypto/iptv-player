@@ -38,3 +38,4 @@ venv/
 # Otros
 .cache/
 tmp/
+m3u/
