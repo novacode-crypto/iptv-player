@@ -55,12 +55,12 @@ export function WatchPage() {
           channel={channel}
           onNext={canStep ? () => step(1) : undefined}
           onPrev={canStep ? () => step(-1) : undefined}
-          className="aspect-video max-h-[74vh] sm:rounded-2xl sm:shadow-card"
+          className="aspect-video max-h-[74vh] sm:rounded-[10px] sm:shadow-card"
         />
 
         {channel ? (
-          <div className="mx-4 flex flex-wrap items-center gap-4 rounded-2xl border border-line bg-surface p-4 shadow-card sm:mx-0 anim-fade-up">
-            <ChannelLogo name={channel.name} logo={channel.logo} className="h-16 w-24 shrink-0 rounded-xl border border-line" imgClassName="p-2" />
+          <div className="mx-4 flex flex-wrap items-center gap-4 rounded-[10px] border border-line bg-surface p-4 shadow-card sm:mx-0 anim-fade-up">
+            <ChannelLogo name={channel.name} logo={channel.logo} className="h-16 w-24 shrink-0 rounded-[8px] border border-line" imgClassName="p-2" />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <h1 className="truncate text-xl font-bold">{channel.name}</h1>
@@ -77,20 +77,20 @@ export function WatchPage() {
                 {channel.tvgId ? ` · tvg-id: ${channel.tvgId}` : ""}
               </p>
             </div>
-            <FavoriteButton id={channel.id} className="h-10 w-10 bg-surface2!" />
+            <FavoriteButton id={channel.id} className="h-10 w-10 bg-surface2! text-mute" />
           </div>
         ) : (
-          <div className="mx-4 rounded-2xl border border-dashed border-line p-8 text-center sm:mx-0">
-            <p className="font-medium">No hay ningún canal seleccionado</p>
+          <div className="mx-4 rounded-[10px] border border-dashed border-line bg-surface/60 p-8 text-center sm:mx-0">
+            <p className="font-bold">No hay ningún canal seleccionado</p>
             <p className="mt-1 text-sm text-mute">Elige uno de la lista lateral o explora tus canales.</p>
-            <button onClick={() => navigate("/channels")} className="mt-4 inline-flex h-10 items-center gap-2 rounded-xl bg-accent px-4 text-sm font-medium text-white">
+            <button onClick={() => navigate("/channels")} className="mt-4 inline-flex h-10 items-center gap-2 rounded-[8px] grad-primary px-4 text-sm font-semibold text-white shadow-md shadow-accent/25 hover:brightness-110">
               <ArrowLeftIcon className="h-5 w-5" /> Explorar canales
             </button>
           </div>
         )}
       </div>
 
-      <aside className="mx-4 flex h-[60vh] min-h-0 flex-col rounded-2xl border border-line bg-surface shadow-card sm:mx-0 lg:h-[calc(100vh-7rem)]" aria-label="Más canales">
+      <aside className="mx-4 flex h-[60vh] min-h-0 flex-col rounded-[10px] border border-line bg-surface shadow-card sm:mx-0 lg:h-[calc(100vh-7rem)]" aria-label="Más canales">
         <div className="flex gap-1 border-b border-line p-2" role="tablist">
           {(
             [
@@ -104,7 +104,12 @@ export function WatchPage() {
               role="tab"
               aria-selected={tab === t}
               onClick={() => setTab(t)}
-              className={cn("h-9 flex-1 truncate rounded-xl px-2 text-xs font-medium transition-all", tab === t ? "bg-accent text-white" : "text-mute hover:bg-ink/5 hover:text-ink")}
+              className={cn(
+                "h-9 flex-1 truncate rounded-[8px] px-2 text-xs font-semibold transition-all",
+                tab === t
+                  ? "grad-primary text-white shadow-sm shadow-accent/30"
+                  : "text-mute hover:bg-surface2 hover:text-ink",
+              )}
             >
               {label}
             </button>

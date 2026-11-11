@@ -91,7 +91,7 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  theme: "dark",
+  theme: "light",
   density: "comfortable",
   autoplay: true,
   startMuted: false,

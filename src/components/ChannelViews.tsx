@@ -6,7 +6,7 @@ import type { Channel } from "@/lib/types";
 import { initials } from "@/lib/utils";
 import { cn } from "@/utils/cn";
 
-const PALETTE = ["#7C6AFF", "#00D2FF", "#22C55E", "#F59E0B", "#EC4899", "#F97316", "#14B8A6", "#6366F1"];
+const PALETTE = ["#7C5CFC", "#2BD9C7", "#4A7CF7", "#F06BB3", "#F5A623", "#38B6D8", "#9B6BF3", "#8B5CF6"];
 function colorFor(name: string) {
   let h = 0;
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
@@ -67,8 +67,8 @@ export function FavoriteButton({ id, className }: { id: string; className?: stri
       aria-pressed={fav}
       title={fav ? "Quitar de favoritos" : "Añadir a favoritos"}
       className={cn(
-        "grid h-8 w-8 place-items-center rounded-full backdrop-blur transition-all duration-200 hover:scale-110",
-        fav ? "bg-pink-500/20 text-pink-400" : "bg-black/40 text-white/80 hover:text-white",
+        "grid h-8 w-8 place-items-center rounded-[8px] backdrop-blur transition-all duration-200 hover:scale-110",
+        fav ? "bg-brand-pink/20 text-brand-pink" : "bg-black/40 text-white/80 hover:text-white",
         className,
       )}
     >
@@ -106,14 +106,14 @@ export const ChannelCard = memo(function ChannelCard({
       onClick={() => onPlay(channel.id)}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onPlay(channel.id))}
       className={cn(
-        "group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border bg-surface shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60",
-        highlight ? "border-accent" : "border-line",
+        "group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[10px] border bg-surface shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover",
+        highlight ? "border-accent" : "border-line hover:border-accent/60",
       )}
     >
       <div className="relative aspect-[16/10] w-full shrink-0 bg-surface2">
         <ChannelLogo name={channel.name} logo={channel.logo} className="h-full w-full" imgClassName="p-4" />
         <div className="absolute inset-0 grid place-items-center bg-black/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-          <span className="grid h-12 w-12 place-items-center rounded-full bg-accent text-white shadow-lg shadow-accent/40">
+          <span className="grid h-12 w-12 place-items-center rounded-full grad-primary-br text-white shadow-lg shadow-accent/40">
             <PlayIcon className="h-6 w-6 translate-x-px" />
           </span>
         </div>
@@ -155,8 +155,8 @@ export const ChannelRow = memo(function ChannelRow({
       onClick={() => onPlay(channel.id)}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onPlay(channel.id))}
       className={cn(
-        "group flex h-full cursor-pointer items-center gap-3 rounded-xl border px-3 transition-all duration-200 hover:border-accent/60 hover:bg-surface2",
-        highlight ? "border-accent bg-accent/10" : "border-transparent bg-surface/60",
+        "group flex h-full cursor-pointer items-center gap-3 rounded-[8px] border px-3 transition-all duration-200 hover:border-accent/50 hover:bg-surface2",
+        highlight ? "border-accent bg-accent/10" : "border-transparent bg-surface/70",
       )}
     >
       <ChannelLogo name={channel.name} logo={channel.logo} className={cn("shrink-0 rounded-lg", compact ? "h-9 w-12" : "h-11 w-16")} imgClassName="p-1" />

@@ -1,33 +1,75 @@
 @import "tailwindcss";
 
-/* ------------ Tokens de diseño (tema oscuro por defecto) ------------ */
+/* ------------------------------------------------------------------
+   NEXA IPTV · Sistema de diseño "Aurora"
+   Inspirado en un dashboard de gradiente violeta:
+   · Fondo lavanda suave con degradado diagonal + halos de color
+   · Tarjetas blancas con sombra suave y esquinas poco redondeadas
+   · Barra lateral índigo profundo (#2E2A72 → #1B1848) con iconos de color
+   · Gradiente primario violeta (#7C5CFC → #9B6BF3)
+   · Acentos: teal #2BD9C7, azul #4A7CF7, rosa #F06BB3, ámbar #F5A623
+   ------------------------------------------------------------------ */
 :root,
-:root[data-theme="dark"] {
-  --c-bg: #090d16;
-  --c-surface: #111827;
-  --c-surface2: #182235;
-  --c-accent: #7c6aff;
-  --c-accent2: #00d2ff;
-  --c-ink: #f8fafc;
-  --c-mute: #94a3b8;
-  --c-line: rgb(148 163 184 / 0.14);
-  --c-glass: rgb(17 24 39 / 0.72);
-  --shadow-card: 0 10px 30px -12px rgb(0 0 0 / 0.6);
-  color-scheme: dark;
+:root[data-theme="light"] {
+  --c-bg: #e9e5f7;
+  --c-bg-grad-a: #ece8f9;
+  --c-bg-grad-b: #cbc2ec;
+  --c-surface: #ffffff;
+  --c-surface2: #f4f2fb;
+  --c-ink: #1e1b33;
+  --c-mute: #8a88a3;
+  --c-line: rgb(30 27 51 / 0.10);
+  --c-glass: rgb(255 255 255 / 0.88);
+
+  --c-accent: #7c5cfc;
+  --c-accent2: #9b6bf3;
+  --c-teal: #2bd9c7;
+  --c-blue: #4a7cf7;
+  --c-pink: #f06bb3;
+  --c-yellow: #f5a623;
+
+  --c-side-1: #2e2a72;
+  --c-side-2: #1b1848;
+  --c-side-ink: #ffffff;
+  --c-side-mute: #b8b4e0;
+
+  --c-hero-1: #3b2f8f;
+  --c-hero-2: #1e1852;
+
+  --shadow-card: 0 8px 24px rgb(76 62 150 / 0.1);
+  --shadow-card-hover: 0 14px 32px rgb(76 62 150 / 0.18);
+  color-scheme: light;
 }
 
-:root[data-theme="light"] {
-  --c-bg: #f1f5f9;
-  --c-surface: #ffffff;
-  --c-surface2: #e8edf5;
-  --c-accent: #6552f0;
-  --c-accent2: #0891b2;
-  --c-ink: #0f172a;
-  --c-mute: #556176;
-  --c-line: rgb(15 23 42 / 0.12);
-  --c-glass: rgb(255 255 255 / 0.8);
-  --shadow-card: 0 10px 30px -14px rgb(15 23 42 / 0.25);
-  color-scheme: light;
+:root[data-theme="dark"] {
+  --c-bg: #141029;
+  --c-bg-grad-a: #181338;
+  --c-bg-grad-b: #100c22;
+  --c-surface: #1d1939;
+  --c-surface2: #282353;
+  --c-ink: #f1eefa;
+  --c-mute: #9a98b5;
+  --c-line: rgb(255 255 255 / 0.1);
+  --c-glass: rgb(29 25 57 / 0.88);
+
+  --c-accent: #8b6cf7;
+  --c-accent2: #b9a5ff;
+  --c-teal: #2bd9c7;
+  --c-blue: #6e8ff9;
+  --c-pink: #f27bbd;
+  --c-yellow: #f7b955;
+
+  --c-side-1: #2e2a72;
+  --c-side-2: #1b1848;
+  --c-side-ink: #ffffff;
+  --c-side-mute: #b8b4e0;
+
+  --c-hero-1: #342a82;
+  --c-hero-2: #1a1548;
+
+  --shadow-card: 0 10px 28px rgb(6 4 22 / 0.55);
+  --shadow-card-hover: 0 14px 36px rgb(6 4 22 / 0.65);
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -40,7 +82,14 @@
   --color-mute: var(--c-mute);
   --color-line: var(--c-line);
   --color-glass: var(--c-glass);
+  --color-brand-teal: var(--c-teal);
+  --color-brand-blue: var(--c-blue);
+  --color-brand-pink: var(--c-pink);
+  --color-brand-yellow: var(--c-yellow);
+  --color-side-ink: var(--c-side-ink);
+  --color-side-mute: var(--c-side-mute);
   --shadow-card: var(--shadow-card);
+  --shadow-card-hover: var(--shadow-card-hover);
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -52,7 +101,12 @@ body,
 
 body {
   margin: 0;
-  background: var(--c-bg);
+  background:
+    radial-gradient(860px 440px at 88% -12%, rgb(124 92 252 / 0.2), transparent 62%),
+    radial-gradient(680px 380px at -10% 14%, rgb(43 217 199 / 0.12), transparent 60%),
+    radial-gradient(900px 520px at 50% 118%, rgb(74 124 247 / 0.1), transparent 62%),
+    linear-gradient(135deg, var(--c-bg-grad-a) 0%, var(--c-bg-grad-b) 100%);
+  background-attachment: fixed;
   color: var(--c-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -61,16 +115,20 @@ body {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgb(148 163 184 / 0.3) transparent;
+  scrollbar-color: rgb(124 92 252 / 0.35) transparent;
 }
 *::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 *::-webkit-scrollbar-thumb {
-  background: rgb(148 163 184 / 0.28);
+  background: rgb(124 92 252 / 0.32);
   border-radius: 999px;
   border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgb(124 92 252 / 0.5);
   background-clip: padding-box;
 }
 
@@ -82,21 +140,50 @@ button:disabled {
 }
 
 :focus-visible {
-  outline: 2px solid var(--c-accent2);
+  outline: 2px solid var(--c-accent);
   outline-offset: 2px;
 }
 
-.bg-aurora {
+/* ---- Fondos característicos ---- */
+
+/* Barra lateral índigo profundo (idéntica en ambos temas, como el diseño) */
+.sidebar-bg {
   background:
-    radial-gradient(900px 400px at 85% -10%, rgb(124 106 255 / 0.22), transparent 60%),
-    radial-gradient(700px 360px at 0% 0%, rgb(0 210 255 / 0.1), transparent 60%);
+    radial-gradient(320px 180px at 110% -8%, rgb(124 92 252 / 0.35), transparent 60%),
+    radial-gradient(260px 200px at -20% 108%, rgb(43 217 199 / 0.14), transparent 60%),
+    linear-gradient(180deg, var(--c-side-1) 0%, var(--c-side-2) 100%);
 }
 
+/* Tarjeta héroe oscura con degradado índigo (continuar viendo, bienvenida) */
+.hero-bg {
+  background:
+    radial-gradient(420px 220px at 88% -20%, rgb(155 107 243 / 0.4), transparent 62%),
+    radial-gradient(300px 200px at 6% 120%, rgb(43 217 199 / 0.18), transparent 60%),
+    linear-gradient(135deg, var(--c-hero-1) 0%, var(--c-hero-2) 100%);
+  color: #fff;
+}
+
+/* Halo suave sobre fondos claros (pantalla de bienvenida) */
+.bg-aurora {
+  background:
+    radial-gradient(520px 260px at 80% 0%, rgb(255 255 255 / 0.55), transparent 60%),
+    radial-gradient(380px 240px at 10% 90%, rgb(124 92 252 / 0.08), transparent 60%);
+}
+
+/* Texto con degradado de marca */
 .gradient-text {
-  background: linear-gradient(90deg, var(--c-accent), var(--c-accent2));
+  background: linear-gradient(90deg, var(--c-accent), var(--c-teal));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Gradiente primario de marca (idéntico en ambos temas, con texto blanco encima) */
+.grad-primary {
+  background-image: linear-gradient(90deg, #7c5cfc, #9b6bf3);
+}
+.grad-primary-br {
+  background-image: linear-gradient(135deg, #7c5cfc, #9b6bf3);
 }
 
 /* Animaciones */
@@ -160,7 +247,7 @@ input[type="range"].nx-range {
   border-radius: 999px;
   background: linear-gradient(
     to right,
-    var(--c-accent2) var(--fill, 0%),
+    var(--c-accent) var(--fill, 0%),
     rgb(255 255 255 / 0.25) var(--fill, 0%)
   );
   outline-offset: 6px;
@@ -171,7 +258,7 @@ input[type="range"].nx-range::-webkit-slider-thumb {
   height: 14px;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 0 0 4px rgb(0 210 255 / 0.25);
+  box-shadow: 0 0 0 4px rgb(124 92 252 / 0.3);
 }
 input[type="range"].nx-range::-moz-range-thumb {
   width: 14px;

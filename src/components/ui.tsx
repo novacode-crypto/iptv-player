@@ -15,10 +15,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-gradient-to-r from-accent to-[#5b8cff] text-white shadow-lg shadow-accent/25 hover:brightness-110 active:brightness-95",
-  secondary: "bg-surface2 text-ink border border-line hover:border-accent/50 hover:bg-surface2/70",
+    "grad-primary text-white shadow-md shadow-accent/25 hover:brightness-110 active:brightness-95",
+  secondary: "bg-surface text-ink border border-line shadow-xs hover:border-accent/50 hover:bg-surface2/70",
   ghost: "text-mute hover:text-ink hover:bg-ink/5",
-  danger: "bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20",
+  danger: "bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500/20",
 };
 
 export function Button({ variant = "secondary", size = "md", icon: Icon, loading, className, children, disabled, ...rest }: ButtonProps) {
@@ -27,7 +27,7 @@ export function Button({ variant = "secondary", size = "md", icon: Icon, loading
       {...rest}
       disabled={disabled || loading}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-200 select-none disabled:opacity-50 whitespace-nowrap",
+        "inline-flex items-center justify-center gap-2 rounded-[8px] font-medium transition-all duration-200 select-none disabled:opacity-50 whitespace-nowrap",
         size === "sm" && "h-8 px-3 text-xs",
         size === "md" && "h-10 px-4 text-sm",
         size === "lg" && "h-12 px-6 text-sm",
@@ -54,7 +54,7 @@ export function IconButton({
       aria-label={label}
       title={label}
       className={cn(
-        "grid h-9 w-9 shrink-0 place-items-center rounded-xl text-mute transition-all duration-200 hover:bg-ink/10 hover:text-ink disabled:opacity-40",
+        "grid h-9 w-9 shrink-0 place-items-center rounded-[8px] text-mute transition-all duration-200 hover:bg-ink/10 hover:text-ink disabled:opacity-40",
         active && "bg-accent/15 text-accent",
         className,
       )}
@@ -80,7 +80,10 @@ export function Toggle({ checked, onChange, label }: { checked: boolean; onChang
       aria-checked={checked}
       aria-label={label}
       onClick={() => onChange(!checked)}
-      className={cn("relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200", checked ? "bg-accent" : "bg-ink/20")}
+      className={cn(
+        "relative h-6 w-11 shrink-0 rounded-full transition-all duration-200",
+        checked ? "grad-primary shadow-sm shadow-accent/30" : "bg-ink/20",
+      )}
     >
       <span className={cn("absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200", checked && "translate-x-5")} />
     </button>
@@ -97,20 +100,27 @@ export function Segmented<T extends string>({
   options: { value: T; label: string; icon?: IconType }[];
 }) {
   return (
-    <div className="inline-flex rounded-xl border border-line bg-surface p-1">
-      {options.map((o) => (
-        <button
-          key={o.value}
-          onClick={() => onChange(o.value)}
-          className={cn(
-            "inline-flex h-8 items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition-all duration-200",
-            value === o.value ? "bg-accent text-white shadow" : "text-mute hover:text-ink",
-          )}
-        >
-          {o.icon && <o.icon className="h-4 w-4" />}
-          {o.label}
-        </button>
-      ))}
+    <div className="inline-flex rounded-[8px] border border-line bg-surface2 p-1" role="tablist">
+      {options.map((o) => {
+        const active = value === o.value;
+        return (
+          <button
+            key={o.value}
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(o.value)}
+            className={cn(
+              "inline-flex h-8 items-center gap-1.5 rounded-[6px] px-3 text-xs font-semibold transition-all duration-200",
+              active
+                ? "grad-primary text-white shadow-sm shadow-accent/30"
+                : "text-mute hover:text-ink",
+            )}
+          >
+            {o.icon && <o.icon className="h-4 w-4" />}
+            {o.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -134,7 +144,7 @@ export function Select({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className={cn(
-        "h-10 rounded-xl border border-line bg-surface px-3 text-sm text-ink outline-none transition-colors hover:border-accent/50 focus:border-accent",
+        "h-10 rounded-[8px] border border-line bg-surface px-3 text-sm text-ink outline-none transition-colors hover:border-accent/50 focus:border-accent",
         className,
       )}
     >
@@ -166,7 +176,7 @@ export function ConfirmButton({
   const [asking, setAsking] = useState(false);
   if (!asking) {
     return iconOnly && icon ? (
-      <IconButton icon={icon} label={label} onClick={() => setAsking(true)} className="hover:text-red-400" />
+      <IconButton icon={icon} label={label} onClick={() => setAsking(true)} className="hover:text-red-500" />
     ) : (
       <Button variant="danger" size={size} icon={icon} onClick={() => setAsking(true)}>
         {label}
@@ -174,19 +184,19 @@ export function ConfirmButton({
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 rounded-xl border border-red-500/40 bg-red-500/10 p-1 anim-fade-up" role="alertdialog" aria-label={`Confirmar: ${label}`}>
-      <span className="px-2 text-xs font-medium text-red-300">¿Seguro?</span>
+    <span className="inline-flex items-center gap-1 rounded-[8px] border border-red-500/40 bg-red-500/10 p-1 anim-fade-up" role="alertdialog" aria-label={`Confirmar: ${label}`}>
+      <span className="px-2 text-xs font-medium text-red-500">¿Seguro?</span>
       <button
         onClick={() => {
           setAsking(false);
           onConfirm();
         }}
-        className="inline-flex h-7 items-center gap-1 rounded-lg bg-red-500 px-2.5 text-xs font-semibold text-white hover:bg-red-400"
+        className="inline-flex h-7 items-center gap-1 rounded-[6px] bg-red-500 px-2.5 text-xs font-semibold text-white hover:bg-red-400"
       >
         <CheckIcon className="h-4 w-4" />
         {confirmLabel}
       </button>
-      <button onClick={() => setAsking(false)} aria-label="Cancelar" className="grid h-7 w-7 place-items-center rounded-lg text-mute hover:bg-ink/10 hover:text-ink">
+      <button onClick={() => setAsking(false)} aria-label="Cancelar" className="grid h-7 w-7 place-items-center rounded-[6px] text-mute hover:bg-ink/10 hover:text-ink">
         <XMarkIcon className="h-4 w-4" />
       </button>
     </span>
@@ -207,11 +217,11 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-col items-center justify-center rounded-3xl border border-dashed border-line bg-surface/40 px-6 py-14 text-center anim-fade-up", className)}>
-      <div className="mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-accent/20 to-accent2/20 text-accent2">
+    <div className={cn("flex flex-col items-center justify-center rounded-[10px] border border-dashed border-line bg-surface/60 px-6 py-14 text-center anim-fade-up", className)}>
+      <div className="mb-4 grid h-16 w-16 place-items-center rounded-[10px] grad-primary-br text-white shadow-lg shadow-accent/30">
         <Icon className="h-8 w-8" />
       </div>
-      <h3 className="text-lg font-semibold">{title}</h3>
+      <h3 className="text-lg font-bold">{title}</h3>
       {text && <p className="mt-1 max-w-md text-sm text-mute">{text}</p>}
       {children && <div className="mt-5 flex flex-wrap justify-center gap-3">{children}</div>}
     </div>
@@ -233,8 +243,12 @@ export function PageHeader({ title, subtitle, children }: { title: string; subti
 export function SectionTitle({ icon: Icon, title, action }: { icon?: IconType; title: string; action?: ReactNode }) {
   return (
     <div className="mb-3 flex items-center justify-between">
-      <h2 className="flex items-center gap-2 text-lg font-semibold">
-        {Icon && <Icon className="h-5 w-5 text-accent2" />}
+      <h2 className="flex items-center gap-2.5 text-lg font-bold">
+        {Icon && (
+          <span className="grid h-7 w-7 place-items-center rounded-[8px] bg-accent/15 text-accent">
+            <Icon className="h-4 w-4" />
+          </span>
+        )}
         {title}
       </h2>
       {action}
@@ -244,12 +258,12 @@ export function SectionTitle({ icon: Icon, title, action }: { icon?: IconType; t
 
 export function Badge({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-medium text-accent", className)}>
+    <span className={cn("inline-flex items-center gap-1 rounded-full bg-accent/12 px-2 py-0.5 text-[11px] font-semibold text-accent", className)}>
       {children}
     </span>
   );
 }
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("skeleton rounded-2xl", className)} />;
+  return <div className={cn("skeleton rounded-[10px]", className)} />;
 }

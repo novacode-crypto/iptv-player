@@ -68,7 +68,7 @@ function AddPanel({ onClose }: { onClose: () => void }) {
   const count = mode === "url" ? urls.split(/\r?\n/).filter((l) => l.trim()).length : files.length;
 
   return (
-    <section className="mb-6 rounded-3xl border border-accent/40 bg-surface p-5 shadow-card anim-fade-up" aria-label="Añadir lista">
+    <section className="mb-6 rounded-[10px] border border-accent/40 bg-surface p-5 shadow-card anim-fade-up" aria-label="Añadir lista">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">Añadir lista IPTV</h2>
         <Segmented
@@ -96,7 +96,7 @@ function AddPanel({ onClose }: { onClose: () => void }) {
             rows={3}
             spellCheck={false}
             placeholder="https://ejemplo.com/mi-lista.m3u"
-            className="w-full resize-y rounded-xl border border-line bg-bg px-3 py-2.5 font-mono text-sm outline-none placeholder:text-mute/60 focus:border-accent"
+            className="w-full resize-y rounded-[8px] border border-line bg-surface2 px-3 py-2.5 font-mono text-sm outline-none placeholder:text-mute/60 focus:border-accent"
           />
           <p className="mt-1.5 flex items-start gap-1.5 text-xs text-mute">
             <InformationCircleIcon className="mt-px h-4 w-4 shrink-0" />
@@ -121,7 +121,7 @@ function AddPanel({ onClose }: { onClose: () => void }) {
             tabIndex={0}
             onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && fileRef.current?.click()}
             className={cn(
-              "flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-4 py-8 text-center transition-colors",
+              "flex cursor-pointer flex-col items-center justify-center rounded-[10px] border-2 border-dashed px-4 py-8 text-center transition-colors",
               drag ? "border-accent bg-accent/10" : "border-line hover:border-accent/60",
             )}
           >
@@ -143,7 +143,7 @@ function AddPanel({ onClose }: { onClose: () => void }) {
           {files.length > 0 && (
             <ul className="mt-3 space-y-1.5">
               {files.map((f) => (
-                <li key={f.name + f.size} className="flex items-center gap-2 rounded-xl bg-bg px-3 py-2 text-sm">
+                <li key={f.name + f.size} className="flex items-center gap-2 rounded-[8px] bg-surface2 px-3 py-2 text-sm">
                   <DocumentArrowUpIcon className="h-4 w-4 shrink-0 text-mute" />
                   <span className="min-w-0 flex-1 truncate">{f.name}</span>
                   <span className="text-xs text-mute">{formatBytes(f.size)}</span>
@@ -166,12 +166,12 @@ function AddPanel({ onClose }: { onClose: () => void }) {
           maxLength={80}
           onChange={(e) => setName(e.target.value)}
           placeholder="Opcional: p. ej. «Mi lista de casa»"
-          className="h-10 w-full rounded-xl border border-line bg-bg px-3 text-sm outline-none placeholder:text-mute/60 focus:border-accent disabled:opacity-50"
+          className="h-10 w-full rounded-[8px] border border-line bg-surface2 px-3 text-sm outline-none placeholder:text-mute/60 focus:border-accent disabled:opacity-50"
         />
       </div>
 
       {errors.length > 0 && (
-        <ul className="mt-3 space-y-1 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300" role="alert">
+        <ul className="mt-3 space-y-1 rounded-[8px] border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-500" role="alert">
           {errors.map((e, i) => (
             <li key={i} className="flex items-start gap-2">
               <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 shrink-0" />
@@ -202,16 +202,16 @@ function JobRow({ job }: { job: ImportJob }) {
   const stageLabel = { reading: "Descargando", parsing: "Analizando", saving: "Guardando", done: "Completado", error: "Error", duplicate: "Duplicada" }[job.stage];
   const Icon = job.stage === "done" ? CheckCircleIcon : job.stage === "duplicate" ? InformationCircleIcon : ExclamationTriangleIcon;
   return (
-    <li className="rounded-2xl border border-line bg-surface p-3.5 anim-fade-up" aria-live="polite">
+    <li className="rounded-[8px] border border-line bg-surface p-3.5 shadow-xs anim-fade-up" aria-live="polite">
       <div className="flex items-center gap-3">
         {running ? (
           <Spinner className="h-5 w-5 shrink-0 text-accent2" />
         ) : (
-          <Icon className={cn("h-5 w-5 shrink-0", job.stage === "done" && "text-emerald-400", job.stage === "duplicate" && "text-accent2", job.stage === "error" && "text-red-400")} />
+          <Icon className={cn("h-5 w-5 shrink-0", job.stage === "done" && "text-emerald-500", job.stage === "duplicate" && "text-accent2", job.stage === "error" && "text-red-500")} />
         )}
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium">{job.label}</p>
-          <p className={cn("text-xs", job.stage === "error" ? "text-red-300" : "text-mute")}>
+          <p className={cn("text-xs", job.stage === "error" ? "text-red-500" : "text-mute")}>
             {running ? `${stageLabel} · ${job.message}` : job.message}
           </p>
         </div>
@@ -220,7 +220,7 @@ function JobRow({ job }: { job: ImportJob }) {
       {running && (
         <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-ink/10">
           <div
-            className={cn("h-full rounded-full bg-gradient-to-r from-accent to-accent2 transition-all duration-300", job.progress === 0 && "w-1/4 animate-pulse")}
+            className="h-full rounded-full grad-primary transition-all duration-300"
             style={job.progress > 0 ? { width: `${Math.max(4, job.progress * 100)}%` } : undefined}
           />
         </div>
@@ -247,9 +247,9 @@ function PlaylistCard({ p }: { p: Playlist }) {
   };
 
   return (
-    <article className={cn("flex flex-col rounded-3xl border bg-surface p-5 shadow-card transition-all duration-200 anim-fade-up", p.enabled ? "border-line hover:border-accent/50" : "border-line opacity-70")}>
+    <article className={cn("flex flex-col rounded-[10px] border bg-surface p-5 shadow-card transition-all duration-200 anim-fade-up", p.enabled ? "border-line hover:border-accent/50 hover:shadow-card-hover" : "border-line opacity-70")}>
       <div className="flex items-start gap-3">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-accent/25 to-accent2/20 text-accent2">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[10px] bg-brand-yellow text-white shadow-sm">
           <QueueListIcon className="h-6 w-6" />
         </span>
         <div className="min-w-0 flex-1">
@@ -286,27 +286,27 @@ function PlaylistCard({ p }: { p: Playlist }) {
       </div>
 
       <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-        <div className="rounded-xl bg-bg p-3">
+        <div className="rounded-[8px] bg-surface2 p-3">
           <dt className="text-xs text-mute">Canales</dt>
           <dd className="mt-0.5 text-xl font-bold tabular-nums">{p.channelCount.toLocaleString("es-ES")}</dd>
         </div>
-        <div className="rounded-xl bg-bg p-3">
+        <div className="rounded-[8px] bg-surface2 p-3">
           <dt className="text-xs text-mute">Última actualización</dt>
           <dd className="mt-0.5 text-xs font-medium leading-tight">{formatDate(p.updatedAt)}</dd>
         </div>
       </dl>
 
       <div className="mt-3 flex flex-wrap items-center gap-1.5">
-        <Badge className={p.enabled ? "bg-emerald-500/15 text-emerald-400" : "bg-ink/10 text-mute"}>{p.enabled ? "Activa" : "Desactivada"}</Badge>
+        <Badge className={p.enabled ? "bg-emerald-500/12 text-emerald-600" : "bg-ink/10 text-mute"}>{p.enabled ? "Activa" : "Desactivada"}</Badge>
         <Badge className="bg-ink/10 text-mute">Copia local</Badge>
-        {p.duplicatesRemoved > 0 && <Badge className="bg-amber-500/15 text-amber-400">{p.duplicatesRemoved} duplicados omitidos</Badge>}
+        {p.duplicatesRemoved > 0 && <Badge className="bg-amber-500/12 text-amber-600">{p.duplicatesRemoved} duplicados omitidos</Badge>}
         {p.lastError && (
           <Badge className="bg-red-500/15 text-red-400" >
             Última actualización fallida
           </Badge>
         )}
       </div>
-      {p.lastError && <p className="mt-2 text-xs text-red-300">{p.lastError}</p>}
+      {p.lastError && <p className="mt-2 text-xs text-red-500">{p.lastError}</p>}
 
       <div className="mt-4 flex flex-wrap items-center gap-1 border-t border-line pt-3">
         <Button
