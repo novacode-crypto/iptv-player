@@ -1,0 +1,205 @@
+@import "tailwindcss";
+
+/* ------------ Tokens de diseño (tema oscuro por defecto) ------------ */
+:root,
+:root[data-theme="dark"] {
+  --c-bg: #090d16;
+  --c-surface: #111827;
+  --c-surface2: #182235;
+  --c-accent: #7c6aff;
+  --c-accent2: #00d2ff;
+  --c-ink: #f8fafc;
+  --c-mute: #94a3b8;
+  --c-line: rgb(148 163 184 / 0.14);
+  --c-glass: rgb(17 24 39 / 0.72);
+  --shadow-card: 0 10px 30px -12px rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --c-bg: #f1f5f9;
+  --c-surface: #ffffff;
+  --c-surface2: #e8edf5;
+  --c-accent: #6552f0;
+  --c-accent2: #0891b2;
+  --c-ink: #0f172a;
+  --c-mute: #556176;
+  --c-line: rgb(15 23 42 / 0.12);
+  --c-glass: rgb(255 255 255 / 0.8);
+  --shadow-card: 0 10px 30px -14px rgb(15 23 42 / 0.25);
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-surface2: var(--c-surface2);
+  --color-accent: var(--c-accent);
+  --color-accent2: var(--c-accent2);
+  --color-ink: var(--c-ink);
+  --color-mute: var(--c-mute);
+  --color-line: var(--c-line);
+  --color-glass: var(--c-glass);
+  --shadow-card: var(--shadow-card);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(148 163 184 / 0.3) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgb(148 163 184 / 0.28);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-accent2);
+  outline-offset: 2px;
+}
+
+.bg-aurora {
+  background:
+    radial-gradient(900px 400px at 85% -10%, rgb(124 106 255 / 0.22), transparent 60%),
+    radial-gradient(700px 360px at 0% 0%, rgb(0 210 255 / 0.1), transparent 60%);
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, var(--c-accent), var(--c-accent2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Animaciones */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(239 68 68 / 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 8px rgb(239 68 68 / 0);
+  }
+}
+
+.anim-fade-up {
+  animation: fade-up 0.35s ease both;
+}
+.anim-toast {
+  animation: toast-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--c-surface) 0%, var(--c-surface2) 50%, var(--c-surface) 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+.live-dot {
+  animation: pulse-ring 1.6s ease-out infinite;
+}
+
+/* Rango de volumen / progreso */
+input[type="range"].nx-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--c-accent2) var(--fill, 0%),
+    rgb(255 255 255 / 0.25) var(--fill, 0%)
+  );
+  outline-offset: 6px;
+}
+input[type="range"].nx-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgb(0 210 255 / 0.25);
+}
+input[type="range"].nx-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.hide-cursor,
+.hide-cursor * {
+  cursor: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Reproductor en pantalla completa: ocupa toda la pantalla */
+.player-root:fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+  border-radius: 0 !important;
+}
