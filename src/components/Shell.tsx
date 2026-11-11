@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  ArrowDownTrayIcon,
   CheckCircleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -110,21 +109,9 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Pie discreto: descarga de la landing + copyright; el plegado queda como icono mínimo */}
+      {/* Pie discreto: copyright; el plegado queda como icono mínimo */}
       <div className="shrink-0 border-t border-white/10 p-3">
-        <button
-          onClick={() => setMeta({ landingOpen: true })}
-          title="Landing y descarga del ZIP"
-          aria-label="Abrir landing y descarga"
-          className={cn(
-            "flex h-8 w-full items-center gap-2 rounded-[8px] px-2 text-xs font-medium text-side-mute/80 transition-colors hover:bg-white/10 hover:text-white",
-            collapsed && "justify-center px-0",
-          )}
-        >
-          <ArrowDownTrayIcon className="h-4 w-4 shrink-0" />
-          {!collapsed && <span className="truncate">Descargar app</span>}
-        </button>
-        <div className={cn("mt-1 flex h-6 items-center gap-1", collapsed ? "justify-center" : "justify-between")}>
+        <div className={cn("flex h-6 items-center gap-1", collapsed ? "justify-center" : "justify-between")}>
           {!collapsed && <p className="select-none truncate text-[10px] leading-none text-side-mute/45">© 2026 NEXA IPTV · uso privado</p>}
           <button
             onClick={() => setMeta({ sidebarCollapsed: !collapsed })}

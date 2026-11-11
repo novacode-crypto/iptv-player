@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { Header, MobileNav, OfflineBanner, Sidebar, Toasts } from "@/components/Shell";
-import { SidePanel } from "@/components/Landing";
 import { EmptyState } from "@/components/ui";
 import { useRoute } from "@/lib/router";
 import { useStore } from "@/lib/store";
@@ -69,7 +68,6 @@ export default function App() {
       </div>
       <MobileNav />
       <Toasts />
-      <SidePanel />
     </div>
   );
 }
