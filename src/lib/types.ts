@@ -111,6 +111,7 @@ export interface Meta {
   viewMode: "grid" | "list";
   activePlaylist: string; // "all" o id
   firstRunDone: boolean;
+  landingOpen: boolean; // panel lateral con la landing y la descarga ZIP
 }
 
 export const DEFAULT_META: Meta = {
@@ -119,6 +120,7 @@ export const DEFAULT_META: Meta = {
   viewMode: "grid",
   activePlaylist: "all",
   firstRunDone: false,
+  landingOpen: false,
 };
 
 export interface ImportJob {

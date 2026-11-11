@@ -178,6 +178,24 @@ button:disabled {
   color: transparent;
 }
 
+/* Reloj digital premium del topbar */
+@keyframes clock-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0.2;
+  }
+}
+.clock-colon {
+  animation: clock-blink 1s linear infinite;
+}
+.clock-digits {
+  text-shadow: 0 0 18px rgb(124 92 252 / 0.35);
+}
+
 /* Gradiente primario de marca (idéntico en ambos temas, con texto blanco encima) */
 .grad-primary {
   background-image: linear-gradient(90deg, #7c5cfc, #9b6bf3);

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  ArrowDownTrayIcon,
   CheckCircleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -46,11 +47,9 @@ export function Logo({ collapsed, dark = true }: { collapsed?: boolean; dark?: b
         <TvIcon className="h-6 w-6" />
       </div>
       {!collapsed && (
-        <div className="leading-none">
-          <div className={cn("text-lg font-extrabold tracking-wide", dark ? "text-white" : "text-ink")}>
-            NEXA <span className={dark ? "text-accent2" : "gradient-text"}>IPTV</span>
-          </div>
-          <div className={cn("mt-1 text-[10px] font-medium uppercase tracking-[0.18em]", dark ? "text-side-mute" : "text-mute")}>Tu centro multimedia</div>
+        <div className="flex min-w-0 items-baseline gap-1.5 text-lg font-extrabold tracking-wide">
+          <span className={dark ? "text-white" : "text-ink"}>NEXA</span>
+          <span className={dark ? "text-accent2" : "gradient-text"}>IPTV</span>
         </div>
       )}
     </div>
@@ -111,31 +110,31 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Perfil: la app es privada y local, sin cuenta */}
+      {/* Pie discreto: descarga de la landing + copyright; el plegado queda como icono mínimo */}
       <div className="shrink-0 border-t border-white/10 p-3">
-        <div className={cn("flex items-center gap-3 rounded-[8px] p-1.5", collapsed && "justify-center")}>
-          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-accent to-brand-teal text-xs font-bold text-white shadow-md">
-            NX
-          </div>
-          {!collapsed && (
-            <div className="min-w-0 leading-tight">
-              <p className="truncate text-sm font-semibold text-white">Espectador local</p>
-              <p className="truncate text-xs text-side-mute">Privado · sin cuenta</p>
-            </div>
-          )}
-        </div>
         <button
-          onClick={() => setMeta({ sidebarCollapsed: !collapsed })}
-          aria-label={collapsed ? "Expandir barra lateral" : "Contraer barra lateral"}
-          title={collapsed ? "Expandir barra lateral" : "Contraer barra lateral"}
+          onClick={() => setMeta({ landingOpen: true })}
+          title="Landing y descarga del ZIP"
+          aria-label="Abrir landing y descarga"
           className={cn(
-            "mt-2 flex h-10 w-full items-center justify-center gap-2 rounded-[8px] bg-white/8 text-sm font-medium text-white/90 transition-colors hover:bg-white/15",
-            collapsed && "px-0",
+            "flex h-8 w-full items-center gap-2 rounded-[8px] px-2 text-xs font-medium text-side-mute/80 transition-colors hover:bg-white/10 hover:text-white",
+            collapsed && "justify-center px-0",
           )}
         >
-          {collapsed ? <ChevronRightIcon className="h-5 w-5" /> : <ChevronLeftIcon className="h-5 w-5" />}
-          {!collapsed && "Contraer"}
+          <ArrowDownTrayIcon className="h-4 w-4 shrink-0" />
+          {!collapsed && <span className="truncate">Descargar app</span>}
         </button>
+        <div className={cn("mt-1 flex h-6 items-center gap-1", collapsed ? "justify-center" : "justify-between")}>
+          {!collapsed && <p className="select-none truncate text-[10px] leading-none text-side-mute/45">© 2026 NEXA IPTV · uso privado</p>}
+          <button
+            onClick={() => setMeta({ sidebarCollapsed: !collapsed })}
+            aria-label={collapsed ? "Expandir barra lateral" : "Contraer barra lateral"}
+            title={collapsed ? "Expandir barra lateral" : "Contraer barra lateral"}
+            className="grid h-6 w-6 shrink-0 place-items-center rounded-[6px] text-side-mute/40 transition-colors hover:bg-white/10 hover:text-white/90"
+          >
+            {collapsed ? <ChevronRightIcon className="h-3.5 w-3.5" /> : <ChevronLeftIcon className="h-3.5 w-3.5" />}
+          </button>
+        </div>
       </div>
     </aside>
   );
@@ -221,6 +220,37 @@ export function ThemeToggle() {
   );
 }
 
+/** Reloj digital premium del topbar: hora local con segundos parpadeantes y fecha */
+function DigitalClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  const p = (n: number) => String(n).padStart(2, "0");
+  const fecha = now.toLocaleDateString("es-ES", { weekday: "short", day: "2-digit", month: "short" });
+  const iso = `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+  return (
+    <div
+      role="timer"
+      aria-label={`Hora local ${iso}`}
+      className="hidden h-10 shrink-0 select-none items-center gap-3 rounded-[8px] border border-line bg-surface2 px-3 sm:flex"
+    >
+      <span className="hidden flex-col leading-none lg:flex" aria-hidden>
+        <span className="text-[9px] font-semibold uppercase tracking-[0.22em] text-mute">{fecha}</span>
+        <span className="mt-1 h-[3px] w-9 rounded-full grad-primary opacity-80" />
+      </span>
+      <time dateTime={iso} className="clock-digits flex items-baseline text-[17px] font-bold tabular-nums tracking-[0.04em] text-ink">
+        {p(now.getHours())}
+        <span className="clock-colon text-accent2">:</span>
+        {p(now.getMinutes())}
+        <span className="clock-colon text-accent2">:</span>
+        <span className="text-[12px] font-semibold text-mute">{p(now.getSeconds())}</span>
+      </time>
+    </div>
+  );
+}
+
 export function Header() {
   const route = useRoute();
   const query = useStore((s) => s.query);
@@ -293,21 +323,25 @@ export function Header() {
         </select>
       )}
 
-      <div
-        className={cn(
-          "hidden h-10 shrink-0 items-center gap-2 rounded-full border px-3.5 text-xs font-semibold lg:flex",
-          online
-            ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-600"
-            : "border-red-500/25 bg-red-500/10 text-red-500",
-        )}
-        role="status"
-      >
-        {importing ? <Spinner className="h-4 w-4" /> : online ? <SignalIcon className="h-4 w-4" /> : <SignalSlashIcon className="h-4 w-4" />}
-        {importing ? "Importando…" : online ? "En línea" : "Sin conexión"}
-      </div>
+      <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+        <DigitalClock />
 
-      <ThemeToggle />
-      <IconButton icon={Cog6ToothIcon} label="Configuración" onClick={() => navigate("/settings")} className="hidden sm:grid" />
+        <div
+          className={cn(
+            "hidden h-10 shrink-0 items-center gap-2 rounded-full border px-3.5 text-xs font-semibold lg:flex",
+            online
+              ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-600"
+              : "border-red-500/25 bg-red-500/10 text-red-500",
+          )}
+          role="status"
+        >
+          {importing ? <Spinner className="h-4 w-4" /> : online ? <SignalIcon className="h-4 w-4" /> : <SignalSlashIcon className="h-4 w-4" />}
+          {importing ? "Importando…" : online ? "En línea" : "Sin conexión"}
+        </div>
+
+        <IconButton icon={Cog6ToothIcon} label="Configuración" onClick={() => navigate("/settings")} className="hidden sm:grid" />
+        <ThemeToggle />
+      </div>
     </header>
   );
 }
