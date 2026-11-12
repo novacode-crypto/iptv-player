@@ -1,0 +1,3 @@
+# Las capturas del README se sirven desde GitHub; no forman parte del
+# entregable ZIP (git archive las omite para mantenerlo ligero).
+docs/capturas/* export-ignore

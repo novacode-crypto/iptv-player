@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="120" viewBox="0 0 560 120" role="img" aria-label="NEXA IPTV">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7C5CFC"/>
+      <stop offset="1" stop-color="#9B6BF3"/>
+    </linearGradient>
+  </defs>
+  <!-- Icono: cuadrado redondeado con triángulo de reproducción -->
+  <rect x="14" y="14" width="92" height="92" rx="24" fill="url(#g)"/>
+  <path d="M53 44 L53 76 L79 60 Z" fill="#FFFFFF"/>
+  <!-- Marca -->
+  <text x="132" y="79" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="58" font-weight="700" letter-spacing="3">
+    <tspan fill="url(#g)">NEXA</tspan><tspan fill="#6E7681" font-weight="400">&#160;IPTV</tspan>
+  </text>
+</svg>
