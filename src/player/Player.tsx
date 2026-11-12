@@ -756,8 +756,9 @@ function CtrlBtn({
       title={label}
       className={cn(
         "shrink-0 select-none rounded-[8px] text-white/90 transition-all duration-150 hover:bg-white/15 hover:text-white active:scale-90",
-        text ? "inline-flex h-9 items-center justify-center gap-1.5 px-2.5" : "grid place-items-center",
-        big ? "h-10 w-10 sm:h-11 sm:w-11" : "h-9 w-9",
+        /* con texto: anchura automática (min 36px) para que la etiqueta no desborde el botón */
+        text ? "inline-flex h-9 min-w-[36px] items-center justify-center gap-1.5 px-2.5" : "grid place-items-center",
+        !text && (big ? "h-10 w-10 sm:h-11 sm:w-11" : "h-9 w-9"),
         active && "bg-white/15 text-accent2",
         className,
       )}
