@@ -68,7 +68,7 @@ function AddPanel({ onClose }: { onClose: () => void }) {
   const count = mode === "url" ? urls.split(/\r?\n/).filter((l) => l.trim()).length : files.length;
 
   return (
-    <section className="mb-6 rounded-[10px] border border-accent/40 bg-surface p-5 shadow-card anim-fade-up" aria-label="Añadir lista">
+    <section className="mb-6 shrink-0 rounded-[10px] border border-accent/40 bg-surface p-5 shadow-card anim-fade-up" aria-label="Añadir lista">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">Añadir lista IPTV</h2>
         <Segmented
@@ -296,7 +296,7 @@ function PlaylistCard({ p }: { p: Playlist }) {
         </div>
       </dl>
 
-      <div className="mt-3 flex flex-wrap items-center gap-1.5">
+      <div className="mt-3 mb-4 flex flex-wrap items-center gap-1.5">
         <Badge className={p.enabled ? "bg-emerald-500/12 text-emerald-600" : "bg-ink/10 text-mute"}>{p.enabled ? "Activa" : "Desactivada"}</Badge>
         <Badge className="bg-ink/10 text-mute">Copia local</Badge>
         {p.duplicatesRemoved > 0 && <Badge className="bg-amber-500/12 text-amber-600">{p.duplicatesRemoved} duplicados omitidos</Badge>}
@@ -306,9 +306,9 @@ function PlaylistCard({ p }: { p: Playlist }) {
           </Badge>
         )}
       </div>
-      {p.lastError && <p className="mt-2 text-xs text-red-500">{p.lastError}</p>}
+      {p.lastError && <p className="mt-2 mb-4 text-xs text-red-500">{p.lastError}</p>}
 
-      <div className="mt-4 flex flex-wrap items-center gap-1 border-t border-line pt-3">
+      <div className="mt-auto flex flex-wrap items-center gap-1 border-t border-line pt-3">
         <Button
           size="sm"
           variant="secondary"
@@ -367,7 +367,7 @@ export function PlaylistsPage() {
   const showAdd = adding || (ready && playlists.length === 0 && jobs.length === 0);
 
   return (
-    <div className="w-full p-4 pb-24 sm:p-6 md:pb-8">
+    <div className="flex w-full flex-1 flex-col p-4 pb-24 sm:p-6 md:pb-8">
       <PageHeader title="Listas IPTV" subtitle="Administra tus fuentes. Cada lista se guarda como copia local en tu dispositivo.">
         {!showAdd && (
           <Button variant="primary" icon={PlusIcon} onClick={() => setAdding(true)}>
@@ -379,7 +379,7 @@ export function PlaylistsPage() {
       {showAdd && <AddPanel onClose={() => setAdding(false)} />}
 
       {jobs.length > 0 && (
-        <section className="mb-6" aria-label="Importaciones">
+        <section className="mb-6 shrink-0" aria-label="Importaciones">
           <div className="mb-2 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-mute">Actividad de importación</h2>
             <Button size="sm" variant="ghost" onClick={clearJobs}>
@@ -396,14 +396,14 @@ export function PlaylistsPage() {
 
       {playlists.length === 0 ? (
         !showAdd && (
-          <EmptyState icon={QueueListIcon} title="No hay listas importadas" text="Añade una lista M3U/M3U8 para comenzar.">
+          <EmptyState className="flex-1" icon={QueueListIcon} title="No hay listas importadas" text="Añade una lista M3U/M3U8 para comenzar.">
             <Button variant="primary" icon={PlusIcon} onClick={() => setAdding(true)}>
               Añadir lista
             </Button>
           </EmptyState>
         )
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <div className="grid flex-1 content-stretch gap-4 md:auto-rows-fr md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {playlists.map((p) => (
             <PlaylistCard key={p.id} p={p} />
           ))}

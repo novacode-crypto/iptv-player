@@ -17,19 +17,19 @@ export function RecentsPage() {
   const items = useMemo(() => history.map((h) => ({ h, ch: channelMap.get(h.id) })), [history, channelMap]);
 
   return (
-    <div className="w-full p-4 sm:p-6">
+    <div className="flex w-full flex-1 flex-col p-4 pb-24 sm:p-6 md:pb-6">
       <PageHeader title="Recientes" subtitle="Tu historial de reproducción, del más reciente al más antiguo.">
         {items.length > 0 && <ConfirmButton label="Limpiar historial" icon={TrashIcon} onConfirm={clear} confirmLabel="Limpiar" />}
       </PageHeader>
 
       {items.length === 0 ? (
-        <EmptyState icon={ClockIcon} title="Todavía no has visto nada" text="Los canales que reproduzcas aparecerán aquí con la fecha y hora de su última reproducción.">
+        <EmptyState className="flex-1" icon={ClockIcon} title="Todavía no has visto nada" text="Los canales que reproduzcas aparecerán aquí con la fecha y hora de su última reproducción.">
           <button onClick={() => navigate("/channels")} className="h-10 rounded-[8px] grad-primary px-4 text-sm font-semibold text-white shadow-md shadow-accent/25 hover:brightness-110">
             Explorar canales
           </button>
         </EmptyState>
       ) : (
-        <ul className="space-y-2">
+        <ul className="flex-1 space-y-2">
           {items.map(({ h, ch }) => (
             <li
               key={h.id}

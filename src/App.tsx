@@ -46,16 +46,17 @@ export default function App() {
     );
   }
 
-  const fill = route === "/channels" || route === "/favorites";
-
   return (
     <div className="flex h-full flex-col bg-transparent md:flex-row md:gap-3 md:p-3">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col md:gap-3">
         <Header />
         <OfflineBanner />
-        <main className={fill ? "min-h-0 flex-1 overflow-hidden" : "min-h-0 flex-1 overflow-y-auto md:rounded-[10px]"} key={fill ? "fill" : route}>
-          <div className={fill ? "h-full min-h-0" : "min-h-full anim-fade-up"}>
+        {/* Contenedor unificado: el main siempre ocupa el viewport y cada vista
+            estira su contenido (flex-1) para llenarlo; el scroll solo aparece
+            cuando el contenido excede la altura disponible. */}
+        <main className="min-h-0 flex-1 overflow-y-auto md:rounded-[10px]" key={route}>
+          <div className="flex min-h-full flex-col anim-fade-up">
             {route === "/" && <HomePage />}
             {route === "/channels" && <ChannelsPage />}
             {route === "/favorites" && <ChannelsPage favoritesOnly />}

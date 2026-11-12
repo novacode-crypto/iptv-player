@@ -73,7 +73,7 @@ export function ChannelsPage({ favoritesOnly = false }: { favoritesOnly?: boolea
 
   if (!ready) {
     return (
-      <div className="p-6">
+      <div className="flex flex-1 flex-col justify-center p-6">
         <Skeleton className="mb-6 h-10 w-64" />
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {Array.from({ length: 10 }).map((_, i) => (
@@ -86,7 +86,7 @@ export function ChannelsPage({ favoritesOnly = false }: { favoritesOnly?: boolea
 
   if (playlists.length === 0) {
     return (
-      <div className="p-6">
+      <div className="flex flex-1 flex-col justify-center p-6">
         <EmptyState icon={QueueListIcon} title="Aún no hay canales" text="Importa una lista M3U/M3U8 desde una URL o un archivo para empezar a explorar tus canales.">
           <button onClick={() => navigate("/playlists")} className="inline-flex h-11 items-center gap-2 rounded-[8px] grad-primary px-5 text-sm font-semibold text-white shadow-md shadow-accent/25 hover:brightness-110">
             <PlusIcon className="h-5 w-5" /> Añadir lista
@@ -97,7 +97,7 @@ export function ChannelsPage({ favoritesOnly = false }: { favoritesOnly?: boolea
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex flex-1 flex-col">
       <div className="shrink-0 px-4 pb-3 pt-5 sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>

@@ -74,8 +74,8 @@ function ActivityCard({ history }: { history: { id: string; playedAt: number; co
   const fmt = new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "numeric", month: "short" });
 
   return (
-    <section className="rounded-[10px] border border-line bg-surface p-5 shadow-card anim-fade-up">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <section className="flex h-full min-h-0 flex-1 flex-col rounded-[10px] border border-line bg-surface p-5 shadow-card anim-fade-up">
+      <div className="mb-4 flex shrink-0 flex-wrap items-center justify-between gap-3">
         <SectionTitle icon={ChartBarIcon} title="Actividad de reproducción" />
         <Segmented<"7" | "30">
           value={range}
@@ -88,12 +88,12 @@ function ActivityCard({ history }: { history: { id: string; playedAt: number; co
       </div>
 
       {total === 0 ? (
-        <p className="flex h-32 items-center justify-center rounded-[8px] border border-dashed border-line text-sm text-mute">
+        <p className="flex min-h-32 flex-1 items-center justify-center rounded-[8px] border border-dashed border-line text-sm text-mute">
           Aún no hay reproducciones en este periodo.
         </p>
       ) : (
         <>
-          <div className="flex h-28 items-end gap-[3px] sm:gap-1.5" role="img" aria-label={`Reproducciones por día: ${total} en total`}>
+          <div className="flex min-h-28 flex-1 items-end gap-[3px] sm:gap-1.5" role="img" aria-label={`Reproducciones por día: ${total} en total`}>
             {buckets.map((b) => (
               <div
                 key={b.key}
@@ -111,7 +111,7 @@ function ActivityCard({ history }: { history: { id: string; playedAt: number; co
             ))}
           </div>
           {range === "7" && (
-            <div className="mt-2 flex gap-[3px] text-center text-[10px] font-medium text-mute sm:gap-1.5">
+            <div className="mt-2 flex shrink-0 gap-[3px] text-center text-[10px] font-medium text-mute sm:gap-1.5">
               {buckets.map((b) => (
                 <span key={b.key} className="flex-1 truncate">
                   {new Intl.DateTimeFormat("es-ES", { weekday: "narrow" }).format(b.date)}
@@ -119,7 +119,7 @@ function ActivityCard({ history }: { history: { id: string; playedAt: number; co
               ))}
             </div>
           )}
-          <p className="mt-3 text-xs text-mute">
+          <p className="mt-3 shrink-0 text-xs text-mute">
             <span className="font-semibold text-ink">{total.toLocaleString("es-ES")}</span> {total === 1 ? "reproducción" : "reproducciones"} en los últimos {days} días
           </p>
         </>
@@ -141,12 +141,12 @@ function CategoriesCard({ counts }: { counts: [string, number][] }) {
   let acc = 0;
 
   return (
-    <section className="rounded-[10px] border border-line bg-surface p-5 shadow-card anim-fade-up">
+    <section className="flex h-full min-h-0 flex-col rounded-[10px] border border-line bg-surface p-5 shadow-card anim-fade-up">
       <SectionTitle icon={ChartPieIcon} title="Categorías" />
       {total === 0 ? (
-        <p className="flex h-40 items-center justify-center text-sm text-mute">Importa una lista para ver su distribución.</p>
+        <p className="flex min-h-40 flex-1 items-center justify-center text-sm text-mute">Importa una lista para ver su distribución.</p>
       ) : (
-        <div className="flex flex-col items-center gap-5">
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5">
           <div className="relative shrink-0">
             <svg viewBox="0 0 140 140" className="h-36 w-36 -rotate-90">
               <circle cx="70" cy="70" r={R} fill="none" stroke="var(--c-surface2)" strokeWidth="20" />
@@ -176,7 +176,7 @@ function CategoriesCard({ counts }: { counts: [string, number][] }) {
               </div>
             </div>
           </div>
-          <ul className="w-full min-w-0 flex-1 space-y-2">
+          <ul className="w-full min-w-0 space-y-2">
             {slices.map((s) => (
               <li key={s.name} className="flex items-center gap-2.5 text-sm">
                 <span className="h-2.5 w-2.5 shrink-0 rounded-[4px]" style={{ background: s.color }} />
@@ -230,14 +230,14 @@ export function HomePage() {
 
   if (!ready) {
     return (
-      <div className="space-y-6 p-4 sm:p-6">
+      <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6">
         <Skeleton className="h-52" />
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-28" />
           ))}
         </div>
-        <Skeleton className="h-48" />
+        <Skeleton className="flex-1" />
       </div>
     );
   }
@@ -245,7 +245,7 @@ export function HomePage() {
   // ---- Primera ejecución / sin listas ----
   if (playlists.length === 0) {
     return (
-      <div className="bg-aurora flex min-h-full flex-col justify-center p-4 sm:p-8">
+      <div className="bg-aurora flex flex-1 flex-col justify-center p-4 sm:p-8">
         <div className="mx-auto max-w-3xl pt-6 text-center anim-fade-up">
           <div className="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-[14px] grad-primary-br text-white shadow-2xl shadow-accent/40">
             <TvIcon className="h-11 w-11" />
@@ -289,9 +289,9 @@ export function HomePage() {
   const active = playlists.filter((p) => p.enabled).length;
 
   return (
-    <div className="w-full space-y-6 p-4 pb-24 sm:p-6 md:pb-6">
+    <div className="flex w-full flex-1 flex-col gap-6 p-4 pb-24 sm:p-6 md:pb-6">
       {/* Héroe: continuar viendo (tarjeta oscura con degradado índigo) */}
-      <section className="hero-bg relative overflow-hidden rounded-[10px] p-5 shadow-card sm:p-7 anim-fade-up">
+      <section className="hero-bg relative shrink-0 overflow-hidden rounded-[10px] p-5 shadow-card sm:p-7 anim-fade-up">
         <div aria-hidden className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-accent2/25 blur-3xl" />
         <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-brand-teal/10 blur-3xl" />
         {last ? (
@@ -333,7 +333,7 @@ export function HomePage() {
       </section>
 
       {/* Estadísticas */}
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="grid shrink-0 grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat icon={Squares2X2Icon} tile="bg-accent" label="Canales" value={channels.length.toLocaleString("es-ES")} hint="Total importado" />
         <Stat icon={QueueListIcon} tile="bg-brand-yellow" label="Listas activas" value={`${active}/${playlists.length}`} hint="Habilitadas" />
         <Stat icon={HeartIcon} tile="bg-brand-pink" label="Favoritos" value={String(Object.keys(favorites).length)} />
@@ -341,15 +341,15 @@ export function HomePage() {
       </section>
 
       {/* Actividad + categorías */}
-      <section className="grid gap-3 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+      <section className="grid min-h-0 flex-1 gap-3 lg:grid-cols-3">
+        <div className="flex min-h-0 lg:col-span-2">
           <ActivityCard history={history} />
         </div>
         <CategoriesCard counts={catCounts} />
       </section>
 
       {/* Favoritos */}
-      <section>
+      <section className="shrink-0">
         <SectionTitle
           icon={HeartIcon}
           title="Canales favoritos"
@@ -369,7 +369,7 @@ export function HomePage() {
       </section>
 
       {/* Recientes */}
-      <section>
+      <section className="shrink-0">
         <SectionTitle
           icon={ClockIcon}
           title="Últimos reproducidos"
@@ -389,7 +389,7 @@ export function HomePage() {
       </section>
 
       {/* Listas */}
-      <section>
+      <section className="shrink-0">
         <SectionTitle icon={QueueListIcon} title="Listas importadas" action={<Button variant="ghost" size="sm" onClick={() => navigate("/playlists")}>Administrar</Button>} />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {playlists.map((p) => (

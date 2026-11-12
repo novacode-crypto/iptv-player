@@ -20,8 +20,8 @@ import { cn } from "@/utils/cn";
 
 function Section({ icon: Icon, tile, title, desc, children }: { icon: IconType; tile: string; title: string; desc?: string; children: ReactNode }) {
   return (
-    <section className="rounded-[10px] border border-line bg-surface p-5 shadow-card sm:p-6">
-      <div className="mb-2 flex items-center gap-3">
+    <section className="flex flex-col rounded-[10px] border border-line bg-surface p-5 shadow-card sm:p-6">
+      <div className="mb-2 flex shrink-0 items-center gap-3">
         <span className={cn("grid h-10 w-10 place-items-center rounded-[8px] text-white shadow-sm", tile)}>
           <Icon className="h-5 w-5" />
         </span>
@@ -30,14 +30,14 @@ function Section({ icon: Icon, tile, title, desc, children }: { icon: IconType; 
           {desc && <p className="text-xs text-mute">{desc}</p>}
         </div>
       </div>
-      <div className="divide-y divide-line">{children}</div>
+      <div className="flex flex-1 flex-col divide-y divide-line">{children}</div>
     </section>
   );
 }
 
 function Row({ title, desc, children }: { title: string; desc?: string; children: ReactNode }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 py-4">
+    <div className="flex flex-1 flex-wrap items-center justify-between gap-3 py-4">
       <div className="min-w-0 max-w-md">
         <p className="text-sm font-medium">{title}</p>
         {desc && <p className="mt-0.5 text-xs text-mute">{desc}</p>}
@@ -67,10 +67,10 @@ export function SettingsPage() {
   }, [nHistory]);
 
   return (
-    <div className="w-full p-4 pb-24 sm:p-6 md:pb-8">
+    <div className="flex w-full flex-1 flex-col p-4 pb-24 sm:p-6 md:pb-8">
       <PageHeader title="Configuración" subtitle="Todas las preferencias se guardan automáticamente en tu dispositivo." />
 
-      <div className="grid grid-cols-1 gap-5 2xl:grid-cols-2 2xl:items-start">
+      <div className="grid flex-1 grid-cols-1 content-stretch gap-5 2xl:grid-cols-2">
 
       <Section icon={SparklesIcon} tile="bg-accent" title="Apariencia">
         <Row title="Tema" desc="El tema claro reproduce el estilo del panel; el oscuro es su versión nocturna.">
@@ -233,7 +233,7 @@ export function SettingsPage() {
       </Section>
 
       <Section icon={ShieldCheckIcon} tile="bg-brand-teal" title="Privacidad y uso responsable">
-        <div className="space-y-2 py-4 text-sm text-mute">
+        <div className="flex flex-1 flex-col justify-center space-y-2 py-4 text-sm text-mute">
           <p>NEXA IPTV funciona íntegramente en tu navegador: no hay cuentas, telemetría ni servidores propios. Tus listas se guardan solo en IndexedDB de este dispositivo.</p>
           <p>La aplicación no incluye canales ni contenido. Eres responsable de utilizar únicamente fuentes que tengas autorización para reproducir.</p>
         </div>
