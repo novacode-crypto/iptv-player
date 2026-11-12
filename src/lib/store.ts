@@ -71,7 +71,7 @@ interface State {
   channelMap: Map<string, IndexedChannel>;
   favorites: Record<string, number>;
   history: HistoryEntry[];
-  status: Record<string, { ok: boolean; at: number }>;
+  status: Record<string, { ok: boolean; at: number; reason?: string }>;
   settings: Settings;
   meta: Meta;
   toasts: Toast[];
@@ -89,7 +89,7 @@ interface State {
   toggleFavorite: (id: string) => void;
   play: (id: string) => void;
   recordPlay: (id: string) => void;
-  markStatus: (id: string, ok: boolean) => void;
+  markStatus: (id: string, ok: boolean, reason?: string) => void;
   /** Borra canales concretos (con favoritos/historial/estado) y devuelve cuántos quitó */
   removeChannels: (ids: string[]) => Promise<number>;
   removeHistory: (id: string) => void;
@@ -116,8 +116,12 @@ export const useStore = create<State>((set, get) => {
 
   const loadPlaylistChannels = async (playlistId: string) => {
     const fresh = (await getChannelsByPlaylist(playlistId)).map(index);
+    // IndexedDB devuelve por clave primaria (hash del id): hay que reordenar por
+    // `order` o la lista aparece barajada hasta la próxima recarga completa.
+    fresh.sort((a, b) => a.order - b.order);
     set((s) => {
       const channels = s.channels.filter((c) => c.playlistId !== playlistId).concat(fresh);
+      channels.sort((a, b) => (a.playlistId === b.playlistId ? a.order - b.order : 0));
       return { channels, channelMap: new Map(channels.map((c) => [c.id, c])) };
     });
   };
@@ -143,7 +147,7 @@ export const useStore = create<State>((set, get) => {
       channelMap: new Map(channels.map((c) => [c.id, c])),
       favorites: Object.fromEntries(favs.map((f) => [f.id, f.addedAt])),
       history: history.sort((a, b) => b.playedAt - a.playedAt),
-      status: Object.fromEntries(statuses.map((s) => [s.id, { ok: s.ok, at: s.at }])),
+      status: Object.fromEntries(statuses.map((s) => [s.id, { ok: s.ok, at: s.at, reason: s.reason }])),
       settings: { ...DEFAULT_SETTINGS, ...settings },
       meta: { ...DEFAULT_META, ...meta },
       currentChannelId: get().currentChannelId ?? meta.lastChannelId ?? null,
@@ -244,12 +248,13 @@ export const useStore = create<State>((set, get) => {
       safe(putOne("history", entry));
     },
 
-    markStatus(id, ok) {
+    markStatus(id, ok, reason) {
       const cur = get().status[id];
-      if (cur && cur.ok === ok && Date.now() - cur.at < 60_000) return;
+      if (cur && cur.ok === ok && cur.reason === reason && Date.now() - cur.at < 60_000) return;
       const at = Date.now();
-      set((s) => ({ status: { ...s.status, [id]: { ok, at } } }));
-      safe(putOne("status", { id, ok, at }));
+      const entry = ok ? { ok, at } : { ok, at, reason };
+      set((s) => ({ status: { ...s.status, [id]: entry } }));
+      safe(putOne("status", { id, ...entry }));
     },
 
     async removeChannels(ids) {
@@ -470,12 +475,15 @@ export const useStore = create<State>((set, get) => {
 
 // ---------- Selectores derivados ----------
 
-/** Canales visibles: listas activas + selector de lista + opción de ocultar duplicados */
+/** Canales visibles: listas activas + selector de lista + ocultar duplicados +
+ *  opcionalmente ocultar los marcados como no disponibles (caídos). */
 export function useVisibleChannels(): IndexedChannel[] {
   const channels = useStore((s) => s.channels);
   const playlists = useStore((s) => s.playlists);
   const active = useStore((s) => s.meta.activePlaylist);
   const hideDup = useStore((s) => s.settings.hideDuplicates);
+  const hideOff = useStore((s) => s.settings.hideOffline);
+  const status = useStore((s) => s.status);
   return useMemo(() => {
     const enabled = new Set(playlists.filter((p) => p.enabled).map((p) => p.id));
     let list = channels.filter((c) => enabled.has(c.playlistId) && (active === "all" || c.playlistId === active));
@@ -483,8 +491,9 @@ export function useVisibleChannels(): IndexedChannel[] {
       const seen = new Set<string>();
       list = list.filter((c) => (seen.has(c.url) ? false : (seen.add(c.url), true)));
     }
+    if (hideOff) list = list.filter((c) => status[c.id]?.ok !== false);
     return list;
-  }, [channels, playlists, active, hideDup]);
+  }, [channels, playlists, active, hideDup, hideOff, status]);
 }
 
 export function usePlaylistNames(): Map<string, string> {

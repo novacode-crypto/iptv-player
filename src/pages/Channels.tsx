@@ -1,5 +1,7 @@
 import { useDeferredValue, useMemo, useState } from "react";
 import {
+  EyeIcon,
+  EyeSlashIcon,
   ListBulletIcon,
   MagnifyingGlassIcon,
   QueueListIcon,
@@ -10,7 +12,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { AvailabilityModal } from "@/components/Availability";
 import { ChannelCard, ChannelRow, VirtualChannels } from "@/components/ChannelViews";
-import { Button, EmptyState, Segmented, Select, Skeleton } from "@/components/ui";
+import { Button, EmptyState, Segmented, Select, Skeleton, Tooltip } from "@/components/ui";
 import { CATEGORIES } from "@/lib/categories";
 import { navigate } from "@/lib/router";
 import { usePlaylistNames, useStore, useVisibleChannels } from "@/lib/store";
@@ -27,9 +29,22 @@ export function ChannelsPage({ favoritesOnly = false }: { favoritesOnly?: boolea
   const meta = useStore((s) => s.meta);
   const setMeta = useStore((s) => s.setMeta);
   const density = useStore((s) => s.settings.density);
+  const hideOffline = useStore((s) => s.settings.hideOffline);
+  const setSettings = useStore((s) => s.setSettings);
   const play = useStore((s) => s.play);
   const visible = useVisibleChannels();
   const names = usePlaylistNames();
+
+  /** Caídos en la selección activa, calculado ANTES del filtro de ocultado
+   *  (así el contador sigue visible aunque los caídos estén escondidos) */
+  const downed = useStore((s) => {
+    const enabled = new Set(s.playlists.filter((p) => p.enabled).map((p) => p.id));
+    let n = 0;
+    for (const c of s.channels) {
+      if (enabled.has(c.playlistId) && (s.meta.activePlaylist === "all" || c.playlistId === s.meta.activePlaylist) && s.status[c.id]?.ok === false) n++;
+    }
+    return n;
+  });
 
   const [category, setCategory] = useState<CategoryName | "all">("all");
   const [group, setGroup] = useState("all");
@@ -97,7 +112,7 @@ export function ChannelsPage({ favoritesOnly = false }: { favoritesOnly?: boolea
   }
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <div className="shrink-0 px-4 pb-3 pt-5 sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -140,12 +155,27 @@ export function ChannelsPage({ favoritesOnly = false }: { favoritesOnly?: boolea
                 { value: "list", label: "Lista", icon: ListBulletIcon },
               ]}
             />
+            <Tooltip
+              label={hideOffline ? `Mostrar canales caídos (${downed.toLocaleString("es-ES")})` : `Ocultar canales caídos (${downed.toLocaleString("es-ES")})`}
+              hint="Los marcados como no disponibles por cualquier motivo (comprobación o error de reproducción) se ocultan de la lista"
+            >
+              <Button
+                variant={hideOffline ? "primary" : "secondary"}
+                size="sm"
+                icon={hideOffline ? EyeIcon : EyeSlashIcon}
+                disabled={downed === 0 && !hideOffline}
+                aria-label={`${hideOffline ? "Mostrar" : "Ocultar"} canales caídos (${downed.toLocaleString("es-ES")})`}
+                aria-pressed={hideOffline}
+                onClick={() => setSettings({ hideOffline: !hideOffline })}
+                className="h-8 px-2.5"
+              />
+            </Tooltip>
             <Button
               variant="secondary"
               size="sm"
               icon={SignalIcon}
               disabled={results.length === 0}
-              title="Comprueba si cada stream responde y ofrece eliminar los caídos"
+              title="Comprueba si cada stream responde y ofrece ocultar o eliminar los caídos"
               onClick={() => setChecking(true)}
             >
               Comprobar streams

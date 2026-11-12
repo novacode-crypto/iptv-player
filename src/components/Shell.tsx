@@ -22,7 +22,7 @@ import {
 import { navigate, useRoute, type Route } from "@/lib/router";
 import { useStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
-import { IconButton, Spinner, type IconType } from "./ui";
+import { IconButton, Spinner, Tooltip, type IconType } from "./ui";
 
 /** Cada sección lleva su icono de color, como el panel de referencia */
 const NAV: { route: Route; label: string; icon: IconType; tile: string; badge?: "channels" | "favorites" | "playlists" }[] = [
@@ -79,11 +79,11 @@ export function Sidebar() {
         {NAV.map((n) => {
           const active = route === n.route;
           const count = n.badge ? counts[n.badge] : 0;
-          return (
+          const item = (
             <button
               key={n.route}
               onClick={() => navigate(n.route)}
-              title={n.label}
+              title={!collapsed ? n.label : undefined}
               aria-current={active ? "page" : undefined}
               className={cn(
                 "group relative flex h-11 w-full items-center gap-3 rounded-[8px] px-2 transition-all duration-200",
@@ -105,6 +105,13 @@ export function Sidebar() {
               )}
               {!collapsed && <ChevronRightIcon className="h-3.5 w-3.5 text-side-mute/60 transition-transform duration-200 group-hover:translate-x-0.5" />}
             </button>
+          );
+          return collapsed ? (
+            <Tooltip key={n.route} label={n.label} hint={count > 0 ? `${count.toLocaleString("es-ES")} en total` : undefined} side="right">
+              {item}
+            </Tooltip>
+          ) : (
+            item
           );
         })}
       </nav>

@@ -5,6 +5,7 @@ import { useStore } from "@/lib/store";
 import type { Channel } from "@/lib/types";
 import { initials } from "@/lib/utils";
 import { cn } from "@/utils/cn";
+import { Tooltip } from "./ui";
 
 const PALETTE = ["#7C5CFC", "#2BD9C7", "#4A7CF7", "#F06BB3", "#F5A623", "#38B6D8", "#9B6BF3", "#8B5CF6"];
 function colorFor(name: string) {
@@ -77,14 +78,51 @@ export function FavoriteButton({ id, className }: { id: string; className?: stri
   );
 }
 
+function relTime(at: number): string {
+  const s = Math.max(0, Math.round((Date.now() - at) / 1000));
+  if (s < 60) return "hace un instante";
+  const m = Math.round(s / 60);
+  if (m < 60) return `hace ${m} min`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `hace ${h} h`;
+  return `hace ${Math.round(h / 24)} d`;
+}
+
+/** Estado de un canal: punto de color + tooltip premium con el motivo y la antigüedad */
 export function StatusDot({ id, className }: { id: string; className?: string }) {
   const st = useStore((s) => s.status[id]);
   if (!st) return null;
   return (
-    <span
-      title={st.ok ? "Reproducción correcta la última vez" : "Falló la última reproducción"}
-      className={cn("inline-flex h-2.5 w-2.5 rounded-full ring-2 ring-black/30", st.ok ? "bg-emerald-400" : "bg-red-500", className)}
-    />
+    <Tooltip
+      label={st.ok ? "Stream en línea" : "Stream caído"}
+      hint={st.ok ? `Comprobado ${relTime(st.at)}` : `${st.reason ?? "Motivo desconocido"} · ${relTime(st.at)}`}
+    >
+      <span
+        className={cn(
+          "inline-flex h-2.5 w-2.5 cursor-help rounded-full ring-2 ring-black/30 transition-transform hover:scale-125",
+          st.ok ? "bg-emerald-400" : "bg-red-500",
+          className,
+        )}
+      />
+    </Tooltip>
+  );
+}
+
+/** Etiqueta «CAÍDO» con tooltip del motivo, para tarjetas y filas marcadas */
+export function OfflineBadge({ id, className }: { id: string; className?: string }) {
+  const st = useStore((s) => s.status[id]);
+  if (!st || st.ok) return null;
+  return (
+    <Tooltip label="Canal no disponible" hint={`${st.reason ?? "Motivo desconocido"} · ${relTime(st.at)}`}>
+      <span
+        className={cn(
+          "inline-flex h-5 shrink-0 cursor-help items-center rounded-[6px] bg-red-500/15 px-1.5 text-[10px] font-bold tracking-wider text-red-500 ring-1 ring-red-500/40 backdrop-blur",
+          className,
+        )}
+      >
+        CAÍDO
+      </span>
+    </Tooltip>
   );
 }
 
@@ -99,19 +137,21 @@ export const ChannelCard = memo(function ChannelCard({
   onPlay: (id: string) => void;
   highlight?: boolean;
 }) {
+  const down = useStore((s) => s.status[channel.id]?.ok === false);
   return (
     <div
       role="button"
       tabIndex={0}
+      data-down={down ? "true" : undefined}
       onClick={() => onPlay(channel.id)}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onPlay(channel.id))}
       className={cn(
         "group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[10px] border bg-surface shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover",
-        highlight ? "border-accent" : "border-line hover:border-accent/60",
+        down ? "border-red-500/45 opacity-80" : highlight ? "border-accent" : "border-line hover:border-accent/60",
       )}
     >
       <div className="relative aspect-[16/10] w-full shrink-0 bg-surface2">
-        <ChannelLogo name={channel.name} logo={channel.logo} className="h-full w-full" imgClassName="p-4" />
+        <ChannelLogo name={channel.name} logo={channel.logo} className="h-full w-full" imgClassName={cn("p-4", down && "opacity-60 grayscale-[35%]")} />
         <div className="absolute inset-0 grid place-items-center bg-black/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <span className="grid h-12 w-12 place-items-center rounded-full grad-primary-br text-white shadow-lg shadow-accent/40">
             <PlayIcon className="h-6 w-6 translate-x-px" />
@@ -119,6 +159,7 @@ export const ChannelCard = memo(function ChannelCard({
         </div>
         <FavoriteButton id={channel.id} className="absolute right-2 top-2" />
         <StatusDot id={channel.id} className="absolute left-2 top-2" />
+        {down && <OfflineBadge id={channel.id} className="absolute bottom-2 left-2" />}
       </div>
       <div className="min-w-0 flex-1 px-3 py-2.5">
         <p className="truncate text-sm font-semibold" title={channel.name}>
@@ -148,20 +189,26 @@ export const ChannelRow = memo(function ChannelRow({
   compact?: boolean;
   trailing?: ReactNode;
 }) {
+  const down = useStore((s) => s.status[channel.id]?.ok === false);
   return (
     <div
       role="button"
       tabIndex={0}
+      data-down={down ? "true" : undefined}
       onClick={() => onPlay(channel.id)}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onPlay(channel.id))}
       className={cn(
         "group flex h-full cursor-pointer items-center gap-3 rounded-[8px] border px-3 transition-all duration-200 hover:border-accent/50 hover:bg-surface2",
-        highlight ? "border-accent bg-accent/10" : "border-transparent bg-surface/70",
+        down
+          ? "border-red-500/35 bg-red-500/[0.04]"
+          : highlight
+            ? "border-accent bg-accent/10"
+            : "border-transparent bg-surface/70",
       )}
     >
-      <ChannelLogo name={channel.name} logo={channel.logo} className={cn("shrink-0 rounded-lg", compact ? "h-9 w-12" : "h-11 w-16")} imgClassName="p-1" />
+      <ChannelLogo name={channel.name} logo={channel.logo} className={cn("shrink-0 rounded-lg", compact ? "h-9 w-12" : "h-11 w-16", down && "opacity-70 grayscale-[35%]")} imgClassName="p-1" />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium" title={channel.name}>
+        <p className={cn("truncate text-sm font-medium", down && "opacity-80")} title={channel.name}>
           {channel.name}
         </p>
         <p className="truncate text-xs text-mute">
@@ -170,6 +217,7 @@ export const ChannelRow = memo(function ChannelRow({
           {listName ? ` · ${listName}` : ""}
         </p>
       </div>
+      {down && <OfflineBadge id={channel.id} />}
       <StatusDot id={channel.id} />
       {trailing}
       <FavoriteButton id={channel.id} className="bg-transparent! text-mute" />

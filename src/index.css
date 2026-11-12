@@ -204,7 +204,11 @@ button:disabled {
   background-image: linear-gradient(135deg, #7c5cfc, #9b6bf3);
 }
 
-/* Animaciones */
+/* Animaciones
+   ⚠ fill-mode «backwards» (no «both»): con «both» el último keyframe deja un
+   transform matrix(...) computado aunque sea la identidad, y eso convierte el
+   elemento en containing block: position:fixed de descendientes (modales,
+   tooltips) pasa a medirse contra la PÁGINA completa, no contra el viewport. */
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -243,7 +247,7 @@ button:disabled {
 }
 
 .anim-fade-up {
-  animation: fade-up 0.35s ease both;
+  animation: fade-up 0.35s ease backwards;
 }
 @keyframes modal-in {
   from {
@@ -264,13 +268,13 @@ button:disabled {
   }
 }
 .anim-modal {
-  animation: modal-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  animation: modal-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1) backwards;
 }
 .anim-fade-in {
-  animation: fade-in 0.18s ease both;
+  animation: fade-in 0.18s ease backwards;
 }
 .anim-toast {
-  animation: toast-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  animation: toast-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1) backwards;
 }
 .skeleton {
   background: linear-gradient(90deg, var(--c-surface) 0%, var(--c-surface2) 50%, var(--c-surface) 100%);
@@ -313,6 +317,72 @@ input[type="range"].nx-range::-moz-range-thumb {
 .hide-cursor,
 .hide-cursor * {
   cursor: none !important;
+}
+
+/* ---- Tooltip premium (portal a body, fijo al viewport) ---- */
+.nx-tip-host {
+  display: inline-flex;
+  max-width: 100%;
+}
+.nx-tip {
+  position: fixed;
+  z-index: 90;
+  max-width: 264px;
+  padding: 7px 11px 8px;
+  border-radius: 8px;
+  border: 1px solid rgb(124 92 252 / 0.45);
+  background: linear-gradient(180deg, rgb(24 20 48 / 0.97), rgb(14 11 32 / 0.97));
+  box-shadow:
+    0 12px 32px rgb(6 4 22 / 0.5),
+    0 0 0 1px rgb(255 255 255 / 0.04) inset,
+    0 -1px 0 rgb(124 92 252 / 0.25) inset;
+  color: #fff;
+  text-align: left;
+  pointer-events: none;
+  animation: fade-in 0.14s ease backwards;
+}
+.nx-tip-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+}
+.nx-tip-hint {
+  display: block;
+  margin-top: 2px;
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: rgb(185 165 255 / 0.75);
+}
+.nx-tip::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: rgb(16 12 36);
+  border-right: 1px solid rgb(124 92 252 / 0.45);
+  border-bottom: 1px solid rgb(124 92 252 / 0.45);
+  transform: rotate(45deg);
+}
+.nx-tip-side-top::after {
+  bottom: -5px;
+  left: var(--ax, 50%);
+}
+.nx-tip-side-bottom::after {
+  top: -5px;
+  left: var(--ax, 50%);
+  transform: rotate(225deg);
+}
+.nx-tip-side-right::after {
+  left: -5px;
+  top: var(--ay, 50%);
+  transform: rotate(135deg);
+}
+.nx-tip-side-left::after {
+  right: -5px;
+  top: var(--ay, 50%);
+  transform: rotate(315deg);
 }
 
 @media (prefers-reduced-motion: reduce) {

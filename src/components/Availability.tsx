@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowPathIcon, CheckCircleIcon, ExclamationTriangleIcon, SignalIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, CheckCircleIcon, EyeSlashIcon, ExclamationTriangleIcon, SignalIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Button, Modal } from "@/components/ui";
 import { probeMany, type ProbeResult } from "@/lib/availability";
 import { useStore } from "@/lib/store";
@@ -36,6 +36,7 @@ function ResultRow({ r }: { r: ProbeResult }) {
 export function AvailabilityModal({ open, channels, onClose }: { open: boolean; channels: Channel[]; onClose: () => void }) {
   const removeChannels = useStore((s) => s.removeChannels);
   const markStatus = useStore((s) => s.markStatus);
+  const setSettings = useStore((s) => s.setSettings);
   const [phase, setPhase] = useState<Phase>("running");
   const [results, setResults] = useState<ProbeResult[]>([]);
   const [total, setTotal] = useState(0);
@@ -62,7 +63,7 @@ export function AvailabilityModal({ open, channels, onClose }: { open: boolean; 
         signal: ctrl.signal,
         onResult: (r) => {
           if (!alive) return;
-          markStatus(r.id, r.ok);
+          markStatus(r.id, r.ok, r.ok ? undefined : r.reason);
           setResults((prev) => [...prev, r]);
         },
       }).then((run) => {
@@ -98,6 +99,11 @@ export function AvailabilityModal({ open, channels, onClose }: { open: boolean; 
     await removeChannels(offline.map((r) => r.id));
     onClose();
   };
+  const doHide = () => {
+    setSettings({ hideOffline: true });
+    useStore.getState().toast("info", `${n(offline.length)} ${offline.length === 1 ? "canal caído oculto" : "canales caídos ocultos"} de la lista — vuelve a verlos con el icono de ojo en la barra`);
+    onClose();
+  };
 
   const title =
     phase === "confirm" ? "Eliminar canales no disponibles" : phase === "removing" ? "Eliminando canales…" : "Comprobación de streams";
@@ -128,9 +134,14 @@ export function AvailabilityModal({ open, channels, onClose }: { open: boolean; 
             <Button variant="ghost" size="sm" onClick={handleClose}>Cerrar</Button>
             <Button variant="secondary" size="sm" icon={ArrowPathIcon} onClick={rerun}>Volver a comprobar</Button>
             {offline.length > 0 && (
-              <Button variant="danger" size="sm" icon={TrashIcon} onClick={() => setPhase("confirm")}>
-                Eliminar {n(offline.length)} no disponibles
-              </Button>
+              <>
+                <Button variant="secondary" size="sm" icon={EyeSlashIcon} onClick={doHide}>
+                  Ocultar {n(offline.length)} no disponibles
+                </Button>
+                <Button variant="danger" size="sm" icon={TrashIcon} onClick={() => setPhase("confirm")}>
+                  Eliminar {n(offline.length)} no disponibles
+                </Button>
+              </>
             )}
           </>
         ) : phase === "confirm" ? (
@@ -220,7 +231,7 @@ export function AvailabilityModal({ open, channels, onClose }: { open: boolean; 
             </p>
           ) : (
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-mute">Canales no disponibles ({n(offline.length)})</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-mute">Canales no disponibles ({n(offline.length)}) · marcados en la lista, puedes ocultarlos o eliminarlos</p>
               <ul className="max-h-56 space-y-1.5 overflow-y-auto pr-1">
                 {offline.slice(0, 200).map((r) => (
                   <ResultRow key={r.id} r={r} />

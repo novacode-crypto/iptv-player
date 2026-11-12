@@ -1,4 +1,5 @@
-import { useEffect, useState, type ButtonHTMLAttributes, type ComponentType, type ReactNode, type SVGProps } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type ComponentType, type ReactElement, type ReactNode, type SVGProps } from "react";
+import { createPortal } from "react-dom";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { cn } from "@/utils/cn";
 
@@ -268,7 +269,10 @@ export function Skeleton({ className }: { className?: string }) {
   return <div className={cn("skeleton rounded-[10px]", className)} />;
 }
 
-/** Modal estilo Aurora: diálogo propio de la app (nunca ventanas del navegador) */
+/** Modal estilo Aurora: diálogo propio de la app (nunca ventanas del navegador).
+ *  Se monta por portal en document.body: así el position:fixed se mide contra el
+ *  viewport aunque la vista que lo abre esté dentro de animaciones/transform
+ *  (una grid de miles de canales ya no “se traga” la modal). */
 export function Modal({
   open,
   onClose,
@@ -299,7 +303,7 @@ export function Modal({
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
   if (!open) return null;
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label={title}>
       <div className="absolute inset-0 bg-ink/45 backdrop-blur-sm anim-fade-in" aria-hidden onClick={onClose} />
       <div
@@ -323,6 +327,123 @@ export function Modal({
         <div className="min-h-0 flex-1 overflow-y-auto p-5">{children}</div>
         {footer && <footer className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-line bg-surface2/60 p-4">{footer}</footer>}
       </div>
-    </div>
+    </div>,
+    document.body,
+  );
+}
+
+/** Tooltip premium: vidrio oscuro, flecha apuntando al origen, retardo corto y
+ *  posicionamiento real (mide su propio tamaño, se voltea si no cabe y se cierra
+ *  al hacer scroll). Se ancla al viewport por portal, nunca dentro de la vista. */
+export function Tooltip({
+  label,
+  hint,
+  side = "top",
+  disabled,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  side?: "top" | "bottom" | "right" | "left";
+  disabled?: boolean;
+  children: ReactElement;
+}) {
+  const hostRef = useRef<HTMLSpanElement | null>(null);
+  const tipRef = useRef<HTMLDivElement | null>(null);
+  const timerRef = useRef<number>(0);
+  const [shown, setShown] = useState(false);
+  const [pos, setPos] = useState<{ left: number; top: number; flip: boolean; ax: number; ay: number } | null>(null);
+
+  const open = () => {
+    window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => setShown(true), 240);
+  };
+  const close = () => {
+    window.clearTimeout(timerRef.current);
+    setShown(false);
+    setPos(null);
+  };
+
+  useLayoutEffect(() => {
+    if (!shown) return;
+    const host = hostRef.current;
+    const tip = tipRef.current;
+    if (!host || !tip) return;
+    const r = host.getBoundingClientRect();
+    const tw = tip.offsetWidth || 200;
+    const th = tip.offsetHeight || 32;
+    const margin = 10;
+    if (side === "right" || side === "left") {
+      let left = side === "right" ? r.right + margin : r.left - tw - margin;
+      left = Math.min(Math.max(8, left), window.innerWidth - tw - 8);
+      let top = r.top + r.height / 2 - th / 2;
+      top = Math.min(Math.max(8, top), window.innerHeight - th - 8);
+      const ay = Math.min(Math.max(r.top + r.height / 2 - top, 12), th - 12);
+      setPos({ left, top, flip: false, ax: 0, ay });
+      return;
+    }
+    let left = r.left + r.width / 2 - tw / 2;
+    left = Math.min(Math.max(8, left), window.innerWidth - tw - 8);
+    const flip = side === "top" && r.top - th - margin < 8;
+    const top = !flip ? r.top - th - margin : r.bottom + margin;
+    const ax = Math.min(Math.max(r.left + r.width / 2 - left, 16), tw - 16);
+    setPos({ left, top, flip, ax, ay: 0 });
+  }, [shown, side, label, hint]);
+
+  useEffect(() => {
+    if (!shown) return;
+    const onAway = () => setShown(false);
+    window.addEventListener("scroll", onAway, true);
+    return () => window.removeEventListener("scroll", onAway, true);
+  }, [shown]);
+
+  useEffect(() => () => window.clearTimeout(timerRef.current), []);
+
+  return (
+    <span
+      ref={hostRef}
+      className="nx-tip-host"
+      onPointerEnter={(e) => {
+        if (disabled || e.pointerType === "touch") return;
+        open();
+      }}
+      onPointerLeave={close}
+      onFocus={() => {
+        if (!disabled) {
+          window.clearTimeout(timerRef.current);
+          setShown(true);
+        }
+      }}
+      onBlur={close}
+    >
+      {children}
+      {shown &&
+        createPortal(
+          <div
+            ref={tipRef}
+            role="tooltip"
+            className={cn(
+              "nx-tip",
+              !pos && "invisible",
+              pos && (pos.flip || side === "bottom")
+                ? "nx-tip-side-bottom"
+                : side === "right"
+                  ? "nx-tip-side-right"
+                  : side === "left"
+                    ? "nx-tip-side-left"
+                    : "nx-tip-side-top",
+            )}
+            style={
+              (pos
+                ? { left: pos.left, top: pos.top, "--ax": `${pos.ax}px`, "--ay": `${pos.ay}px` }
+                : { left: 0, top: 0, "--ax": "50%", "--ay": "50%" }) as React.CSSProperties
+            }
+          >
+            <span className="nx-tip-label">{label}</span>
+            {hint && <span className="nx-tip-hint">{hint}</span>}
+          </div>,
+          document.body,
+        )}
+    </span>
   );
 }

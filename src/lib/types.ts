@@ -67,6 +67,8 @@ export interface StatusEntry {
   id: string;
   ok: boolean;
   at: number;
+  /** Motivo legible del último fallo (comprobación o reproducción) */
+  reason?: string;
 }
 
 export type ThemeMode = "dark" | "light" | "system";
@@ -88,6 +90,8 @@ export interface Settings {
   volume: number; // 0..1
   aspect: AspectMode;
   hideDuplicates: boolean;
+  /** Oculta de las listas los canales marcados como no disponibles */
+  hideOffline: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -103,6 +107,7 @@ export const DEFAULT_SETTINGS: Settings = {
   volume: 0.8,
   aspect: "auto",
   hideDuplicates: false,
+  hideOffline: false,
 };
 
 export interface Meta {

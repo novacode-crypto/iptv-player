@@ -98,6 +98,9 @@ export function SettingsPage() {
         <Row title="Ocultar duplicados entre listas" desc="Si varias listas contienen la misma URL de canal, solo se muestra una vez.">
           <Toggle checked={settings.hideDuplicates} onChange={(hideDuplicates) => set({ hideDuplicates })} label="Ocultar duplicados" />
         </Row>
+        <Row title="Ocultar canales caídos" desc="Los canales marcados como no disponibles (por la comprobación de streams o por errores de reproducción) se ocultan de las listas.">
+          <Toggle checked={settings.hideOffline} onChange={(hideOffline) => set({ hideOffline })} label="Ocultar canales caídos" />
+        </Row>
       </Section>
 
       <Section icon={PlayIcon} tile="bg-brand-blue" title="Reproductor">

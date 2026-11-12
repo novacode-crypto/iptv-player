@@ -18,7 +18,7 @@ import {
   ViewfinderCircleIcon,
 } from "@heroicons/react/24/outline";
 import { ChannelLogo } from "@/components/ChannelViews";
-import { Spinner } from "@/components/ui";
+import { Spinner, Tooltip } from "@/components/ui";
 import { useStore } from "@/lib/store";
 import type { AspectMode, Channel, QualityPref } from "@/lib/types";
 import { formatClock } from "@/lib/utils";
@@ -157,7 +157,7 @@ export function Player({ channel, onNext, onPrev, className }: Props) {
       } else {
         setStatus("error");
         setError(err);
-        if (ch) markStatus(ch.id, false);
+        if (ch) markStatus(ch.id, false, err.message);
       }
     },
     [markStatus],
@@ -682,6 +682,7 @@ export function Player({ channel, onNext, onPrev, className }: Props) {
                 <CtrlBtn
                   icon={AdjustmentsHorizontalIcon}
                   label="Calidad"
+                  hint="Elige la calidad del stream cuando la lista ofrece varias"
                   active={menu === "quality"}
                   onClick={() => setMenu(menu === "quality" ? null : "quality")}
                   text={qualityLabel ?? undefined}
@@ -710,7 +711,7 @@ export function Player({ channel, onNext, onPrev, className }: Props) {
             )}
 
             <div className="relative">
-              <CtrlBtn icon={ViewfinderCircleIcon} label="Relación de aspecto (A)" active={menu === "aspect"} onClick={() => setMenu(menu === "aspect" ? null : "aspect")} />
+              <CtrlBtn icon={ViewfinderCircleIcon} label="Relación de aspecto (A)" hint="Automático, 16:9, 4:3, rellenar o estirar" active={menu === "aspect"} onClick={() => setMenu(menu === "aspect" ? null : "aspect")} />
               {menu === "aspect" && (
                 <Popover title="Relación de aspecto">
                   {ASPECTS.map((a) => (
@@ -735,6 +736,7 @@ export function Player({ channel, onNext, onPrev, className }: Props) {
 function CtrlBtn({
   icon: Icon,
   label,
+  hint,
   onClick,
   big,
   active,
@@ -743,6 +745,7 @@ function CtrlBtn({
 }: {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   label: string;
+  hint?: string;
   onClick: () => void;
   big?: boolean;
   active?: boolean;
@@ -750,22 +753,25 @@ function CtrlBtn({
   text?: string;
 }) {
   return (
-    <button
-      onClick={onClick}
-      aria-label={label}
-      title={label}
-      className={cn(
-        "shrink-0 select-none rounded-[8px] text-white/90 transition-all duration-150 hover:bg-white/15 hover:text-white active:scale-90",
-        /* con texto: anchura automática (min 36px) para que la etiqueta no desborde el botón */
-        text ? "inline-flex h-9 min-w-[36px] items-center justify-center gap-1.5 px-2.5" : "grid place-items-center",
-        !text && (big ? "h-10 w-10 sm:h-11 sm:w-11" : "h-9 w-9"),
-        active && "bg-white/15 text-accent2",
-        className,
-      )}
-    >
-      <Icon className={big ? "h-7 w-7" : "h-5 w-5 sm:h-6 sm:w-6"} />
-      {text && <span className="hidden whitespace-nowrap text-[11px] font-bold tracking-wide tabular-nums sm:inline">{text}</span>}
-    </button>
+    <Tooltip label={label} hint={hint}>
+      <button
+        onClick={onClick}
+        aria-label={label}
+        className={cn(
+          "shrink-0 select-none rounded-[8px] text-white/90 transition-all duration-150 hover:bg-white/15 hover:text-white active:scale-90",
+          /* con texto: anchura automática (min 36px) para que la etiqueta no desborde el botón */
+          text ? "inline-flex h-9 min-w-[36px] items-center justify-center gap-1.5 px-2.5" : "grid place-items-center",
+          !text && (big ? "h-10 w-10 sm:h-11 sm:w-11" : "h-9 w-9"),
+          active && "bg-white/15 text-accent2",
+          className,
+        )}
+      >
+        <Icon className={big ? "h-7 w-7" : "h-5 w-5 sm:h-6 sm:w-6"} />
+        {text && (
+          <span className="hidden max-w-[170px] truncate text-[11px] font-bold tracking-wide tabular-nums sm:inline">{text}</span>
+        )}
+      </button>
+    </Tooltip>
   );
 }
 

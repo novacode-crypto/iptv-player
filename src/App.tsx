@@ -52,11 +52,12 @@ export default function App() {
       <div className="flex min-w-0 flex-1 flex-col md:gap-3">
         <Header />
         <OfflineBanner />
-        {/* Contenedor unificado: el main siempre ocupa el viewport y cada vista
-            estira su contenido (flex-1) para llenarlo; el scroll solo aparece
-            cuando el contenido excede la altura disponible. */}
+        {/* Contenedor unificado: altura exacta del viewport disponible; cada vista
+            estira su contenido (flex-1) y las listas enormes hacen scroll INTERNO.
+            Las páginas con contenido largo (ajustes, listas) desbordan este wrapper
+            y el main las desplaza como antes. */}
         <main className="min-h-0 flex-1 overflow-y-auto md:rounded-[10px]" key={route}>
-          <div className="flex min-h-full flex-col anim-fade-up">
+          <div className="flex h-full flex-col anim-fade-up">
             {route === "/" && <HomePage />}
             {route === "/channels" && <ChannelsPage />}
             {route === "/favorites" && <ChannelsPage favoritesOnly />}
