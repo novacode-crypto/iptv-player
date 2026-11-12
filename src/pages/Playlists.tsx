@@ -367,7 +367,7 @@ export function PlaylistsPage() {
   const showAdd = adding || (ready && playlists.length === 0 && jobs.length === 0);
 
   return (
-    <div className="mx-auto max-w-6xl p-4 pb-24 sm:p-6 md:pb-8">
+    <div className="w-full p-4 pb-24 sm:p-6 md:pb-8">
       <PageHeader title="Listas IPTV" subtitle="Administra tus fuentes. Cada lista se guarda como copia local en tu dispositivo.">
         {!showAdd && (
           <Button variant="primary" icon={PlusIcon} onClick={() => setAdding(true)}>
@@ -403,7 +403,7 @@ export function PlaylistsPage() {
           </EmptyState>
         )
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {playlists.map((p) => (
             <PlaylistCard key={p.id} p={p} />
           ))}

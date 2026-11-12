@@ -67,8 +67,10 @@ export function SettingsPage() {
   }, [nHistory]);
 
   return (
-    <div className="mx-auto max-w-3xl space-y-5 p-4 pb-24 sm:p-6 md:pb-8">
+    <div className="w-full p-4 pb-24 sm:p-6 md:pb-8">
       <PageHeader title="Configuración" subtitle="Todas las preferencias se guardan automáticamente en tu dispositivo." />
+
+      <div className="grid grid-cols-1 gap-5 2xl:grid-cols-2 2xl:items-start">
 
       <Section icon={SparklesIcon} tile="bg-accent" title="Apariencia">
         <Row title="Tema" desc="El tema claro reproduce el estilo del panel; el oscuro es su versión nocturna.">
@@ -236,6 +238,7 @@ export function SettingsPage() {
           <p>La aplicación no incluye canales ni contenido. Eres responsable de utilizar únicamente fuentes que tengas autorización para reproducir.</p>
         </div>
       </Section>
+      </div>
     </div>
   );
 }

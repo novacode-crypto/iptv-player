@@ -49,13 +49,13 @@ export function WatchPage() {
   const canStep = queue.length > 1 || (queue.length === 1 && queue[0].id !== channel?.id);
 
   return (
-    <div className="mx-auto grid max-w-[1700px] gap-4 p-0 pb-20 sm:p-4 md:pb-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <div className="grid w-full gap-4 p-0 pb-20 sm:p-4 md:pb-4 lg:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_400px]">
       <div className="min-w-0 space-y-4">
         <Player
           channel={channel}
           onNext={canStep ? () => step(1) : undefined}
           onPrev={canStep ? () => step(-1) : undefined}
-          className="aspect-video max-h-[74vh] sm:rounded-[10px] sm:shadow-card"
+          className="aspect-video max-h-[76vh] w-full sm:rounded-[10px] sm:shadow-card"
         />
 
         {channel ? (
@@ -90,7 +90,7 @@ export function WatchPage() {
         )}
       </div>
 
-      <aside className="mx-4 flex h-[60vh] min-h-0 flex-col rounded-[10px] border border-line bg-surface shadow-card sm:mx-0 lg:h-[calc(100vh-7rem)]" aria-label="Más canales">
+      <aside className="mx-4 flex h-[60vh] min-h-0 flex-col rounded-[10px] border border-line bg-surface shadow-card sm:mx-0 lg:h-[calc(100vh-7.5rem)]" aria-label="Más canales">
         <div className="flex gap-1 border-b border-line p-2" role="tablist">
           {(
             [

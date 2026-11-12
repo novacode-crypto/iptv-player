@@ -17,7 +17,7 @@ export function RecentsPage() {
   const items = useMemo(() => history.map((h) => ({ h, ch: channelMap.get(h.id) })), [history, channelMap]);
 
   return (
-    <div className="mx-auto max-w-4xl p-4 sm:p-6">
+    <div className="w-full p-4 sm:p-6">
       <PageHeader title="Recientes" subtitle="Tu historial de reproducción, del más reciente al más antiguo.">
         {items.length > 0 && <ConfirmButton label="Limpiar historial" icon={TrashIcon} onConfirm={clear} confirmLabel="Limpiar" />}
       </PageHeader>

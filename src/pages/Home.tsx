@@ -266,7 +266,7 @@ export function HomePage() {
           </div>
         </div>
 
-        <div className="mx-auto mt-12 grid max-w-4xl gap-4 sm:grid-cols-3">
+        <div className="mx-auto mt-12 grid w-full gap-4 sm:grid-cols-3">
           {[
             { icon: ArrowUpTrayIcon, tile: "bg-brand-blue", t: "Importa lo tuyo", d: "Desde una URL o un archivo local. Se guarda una copia, aunque la fuente desaparezca." },
             { icon: LockClosedIcon, tile: "bg-brand-teal", t: "Privado por diseño", d: "Sin cuentas, sin telemetría. Tus listas nunca salen de tu navegador." },
@@ -289,7 +289,7 @@ export function HomePage() {
   const active = playlists.filter((p) => p.enabled).length;
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-4 pb-24 sm:p-6 md:pb-6">
+    <div className="w-full space-y-6 p-4 pb-24 sm:p-6 md:pb-6">
       {/* Héroe: continuar viendo (tarjeta oscura con degradado índigo) */}
       <section className="hero-bg relative overflow-hidden rounded-[10px] p-5 shadow-card sm:p-7 anim-fade-up">
         <div aria-hidden className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-accent2/25 blur-3xl" />
