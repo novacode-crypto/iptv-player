@@ -245,6 +245,30 @@ button:disabled {
 .anim-fade-up {
   animation: fade-up 0.35s ease both;
 }
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.anim-modal {
+  animation: modal-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.anim-fade-in {
+  animation: fade-in 0.18s ease both;
+}
 .anim-toast {
   animation: toast-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1) both;
 }

@@ -10,6 +10,7 @@ import {
 import { DEMO_M3U } from "./demo";
 import {
   clearStore,
+  deleteChannelsCascade,
   deleteOne,
   getChannelsByPlaylist,
   getFavorites,
@@ -89,6 +90,8 @@ interface State {
   play: (id: string) => void;
   recordPlay: (id: string) => void;
   markStatus: (id: string, ok: boolean) => void;
+  /** Borra canales concretos (con favoritos/historial/estado) y devuelve cuántos quitó */
+  removeChannels: (ids: string[]) => Promise<number>;
   removeHistory: (id: string) => void;
   clearHistory: () => Promise<void>;
   importMany: (inputs: ImportInput[]) => Promise<void>;
@@ -247,6 +250,39 @@ export const useStore = create<State>((set, get) => {
       const at = Date.now();
       set((s) => ({ status: { ...s.status, [id]: { ok, at } } }));
       safe(putOne("status", { id, ok, at }));
+    },
+
+    async removeChannels(ids) {
+      if (!ids.length) return 0;
+      const idSet = new Set(ids);
+      const { channels, playlists } = get();
+      const removed = channels.filter((c) => idSet.has(c.id));
+      if (!removed.length) return 0;
+      const byList = new Map<string, number>();
+      for (const c of removed) byList.set(c.playlistId, (byList.get(c.playlistId) ?? 0) + 1);
+      const updatedPlaylists = playlists.map((p) =>
+        byList.has(p.id) ? { ...p, channelCount: Math.max(0, p.channelCount - byList.get(p.id)!) } : p,
+      );
+      try {
+        await deleteChannelsCascade(removed, updatedPlaylists);
+      } catch (e) {
+        get().toast("error", describeDbError(e));
+        return 0;
+      }
+      set((s) => {
+        const channels = s.channels.filter((c) => !idSet.has(c.id));
+        return {
+          channels,
+          channelMap: new Map(channels.map((c) => [c.id, c])),
+          favorites: Object.fromEntries(Object.entries(s.favorites).filter(([k]) => !idSet.has(k))),
+          history: s.history.filter((h) => !idSet.has(h.id)),
+          status: Object.fromEntries(Object.entries(s.status).filter(([k]) => !idSet.has(k))),
+          playlists: updatedPlaylists,
+          currentChannelId: s.currentChannelId && idSet.has(s.currentChannelId) ? null : s.currentChannelId,
+        };
+      });
+      get().toast("success", `${removed.length} ${removed.length === 1 ? "canal caído eliminado" : "canales caídos eliminados"}`);
+      return removed.length;
     },
 
     removeHistory(id) {

@@ -117,8 +117,9 @@ export class PlaybackEngine {
 
   setLevel(index: number) {
     if (!this.hls) return;
-    this.hls.currentLevel = index;
-    this.h.onLevel(index === -1 ? this.hls.currentLevel : index, index === -1);
+    // nextLevel conmuta en el siguiente fragmento: sin corte de búfer en directo
+    this.hls.nextLevel = index;
+    this.h.onLevel(index === -1 ? this.hls.loadLevel : index, index === -1);
   }
 
   dispose() {

@@ -20,7 +20,7 @@ import {
 import { ChannelLogo } from "@/components/ChannelViews";
 import { Spinner } from "@/components/ui";
 import { useStore } from "@/lib/store";
-import type { AspectMode, Channel } from "@/lib/types";
+import type { AspectMode, Channel, QualityPref } from "@/lib/types";
 import { formatClock } from "@/lib/utils";
 import { cn } from "@/utils/cn";
 import { PlaybackEngine, type EngineKind, type PlaybackError, type QualityLevel } from "./engine";
@@ -49,6 +49,16 @@ const SHORTCUTS: [string, string][] = [
 
 const STALL_MS = 25_000;
 const START_MS = 35_000;
+
+/** Traduce la elección del selector a la preferencia persistida en ajustes */
+function levelToPref(index: number, levels: QualityLevel[]): QualityPref {
+  if (index === -1) return "auto";
+  const h = levels.find((l) => l.index === index)?.height ?? 0;
+  if (h >= 1080) return "1080";
+  if (h >= 720) return "720";
+  if (h >= 480) return "480";
+  return "360";
+}
 
 function videoStyle(aspect: AspectMode): React.CSSProperties {
   switch (aspect) {
@@ -365,6 +375,22 @@ export function Player({ channel, onNext, onPrev, className }: Props) {
     flash(`Aspecto: ${next.label}`);
   }, [flash, setSettings]);
 
+  const pickQuality = useCallback(
+    (index: number) => {
+      engineRef.current?.setLevel(index);
+      setMenu(null);
+      if (index === -1) {
+        flash("Calidad: automática");
+        setSettings({ preferredQuality: "auto" });
+        return;
+      }
+      const l = levels.find((x) => x.index === index);
+      flash(`Calidad: ${l?.label ?? "—"}`);
+      setSettings({ preferredQuality: levelToPref(index, levels) });
+    },
+    [flash, levels, setSettings],
+  );
+
   const retry = () => {
     attemptRef.current = 0;
     startLoad();
@@ -416,6 +442,12 @@ export function Player({ channel, onNext, onPrev, className }: Props) {
   const showUI = controlsOn || paused || menu !== null || status === "error" || status === "reconnecting";
   const seekable = !isLive && isFinite(time.dur) && time.dur > 0;
   const busy = status === "loading" || status === "buffering" || status === "reconnecting";
+  const qualityLabel =
+    engineKind === "hls"
+      ? autoLevel
+        ? `Auto${level >= 0 && levels[level] ? `· ${levels[level].label}` : ""}`
+        : (levels[level]?.label ?? "—")
+      : null;
 
   const pill = (() => {
     switch (status) {
@@ -645,22 +677,33 @@ export function Player({ channel, onNext, onPrev, className }: Props) {
 
             <div className="flex-1" />
 
-            {levels.length > 1 && (
+            {engineKind === "hls" && channel && (
               <div className="relative">
-                <CtrlBtn icon={AdjustmentsHorizontalIcon} label="Calidad" active={menu === "quality"} onClick={() => setMenu(menu === "quality" ? null : "quality")} />
+                <CtrlBtn
+                  icon={AdjustmentsHorizontalIcon}
+                  label="Calidad"
+                  active={menu === "quality"}
+                  onClick={() => setMenu(menu === "quality" ? null : "quality")}
+                  text={qualityLabel ?? undefined}
+                />
                 {menu === "quality" && (
                   <Popover title="Calidad">
-                    <PopItem active={autoLevel} onClick={() => { engineRef.current?.setLevel(-1); setMenu(null); }}>
-                      Auto{autoLevel && level >= 0 && levels[level] ? ` (${levels[level].label})` : ""}
+                    <PopItem active={autoLevel} onClick={() => pickQuality(-1)}>
+                      Automática{autoLevel && level >= 0 && levels[level] ? ` (${levels[level].label})` : ""}
                     </PopItem>
                     {[...levels]
                       .sort((a, b) => b.height - a.height || b.bitrate - a.bitrate)
                       .map((l) => (
-                        <PopItem key={l.index} active={!autoLevel && level === l.index} onClick={() => { engineRef.current?.setLevel(l.index); setMenu(null); }}>
+                        <PopItem key={l.index} active={!autoLevel && level === l.index} onClick={() => pickQuality(l.index)}>
                           {l.label}
                           <span className="ml-2 text-white/50">{l.bitrate ? `${(l.bitrate / 1e6).toFixed(1)} Mbps` : ""}</span>
                         </PopItem>
                       ))}
+                    {levels.length <= 1 && (
+                      <p className="px-3 pb-2 pt-1 text-[11px] leading-relaxed text-white/45">
+                        Este stream solo ofrece una calidad.
+                      </p>
+                    )}
                   </Popover>
                 )}
               </div>
@@ -696,6 +739,7 @@ function CtrlBtn({
   big,
   active,
   className,
+  text,
 }: {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   label: string;
@@ -703,6 +747,7 @@ function CtrlBtn({
   big?: boolean;
   active?: boolean;
   className?: string;
+  text?: string;
 }) {
   return (
     <button
@@ -710,13 +755,15 @@ function CtrlBtn({
       aria-label={label}
       title={label}
       className={cn(
-        "grid shrink-0 place-items-center rounded-[8px] text-white/90 transition-all duration-150 hover:bg-white/15 hover:text-white active:scale-90",
+        "shrink-0 select-none rounded-[8px] text-white/90 transition-all duration-150 hover:bg-white/15 hover:text-white active:scale-90",
+        text ? "inline-flex h-9 items-center justify-center gap-1.5 px-2.5" : "grid place-items-center",
         big ? "h-10 w-10 sm:h-11 sm:w-11" : "h-9 w-9",
         active && "bg-white/15 text-accent2",
         className,
       )}
     >
       <Icon className={big ? "h-7 w-7" : "h-5 w-5 sm:h-6 sm:w-6"} />
+      {text && <span className="hidden whitespace-nowrap text-[11px] font-bold tracking-wide tabular-nums sm:inline">{text}</span>}
     </button>
   );
 }

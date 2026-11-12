@@ -177,6 +177,16 @@ export const deletePlaylistCascade = (playlistId: string) =>
     };
   });
 
+/** Elimina canales concretos (con sus favoritos/historial/estado) y guarda el recuento actualizado de cada lista */
+export const deleteChannelsCascade = (channels: Channel[], playlists: Playlist[]) =>
+  run(["channels", "favorites", "history", "status", "playlists"], "readwrite", (t) => {
+    const stores = ["channels", "favorites", "history", "status"] as const;
+    for (const ch of channels) {
+      for (const name of stores) t.objectStore(name).delete(ch.id);
+    }
+    for (const p of playlists) t.objectStore("playlists").put(p);
+  });
+
 export async function getKv<T>(key: string, fallback: T): Promise<T> {
   const row = await run<{ key: string; value: T } | undefined>("kv", "readonly", (t) =>
     t.objectStore("kv").get(key),

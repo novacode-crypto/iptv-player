@@ -4,11 +4,13 @@ import {
   MagnifyingGlassIcon,
   QueueListIcon,
   HeartIcon,
+  SignalIcon,
   Squares2X2Icon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
+import { AvailabilityModal } from "@/components/Availability";
 import { ChannelCard, ChannelRow, VirtualChannels } from "@/components/ChannelViews";
-import { EmptyState, Segmented, Select, Skeleton } from "@/components/ui";
+import { Button, EmptyState, Segmented, Select, Skeleton } from "@/components/ui";
 import { CATEGORIES } from "@/lib/categories";
 import { navigate } from "@/lib/router";
 import { usePlaylistNames, useStore, useVisibleChannels } from "@/lib/store";
@@ -32,6 +34,7 @@ export function ChannelsPage({ favoritesOnly = false }: { favoritesOnly?: boolea
   const [category, setCategory] = useState<CategoryName | "all">("all");
   const [group, setGroup] = useState("all");
   const [sort, setSort] = useState<"default" | "az">("default");
+  const [checking, setChecking] = useState(false);
   const deferredQuery = useDeferredValue(query);
 
   const base = useMemo(() => (favoritesOnly ? visible.filter((c) => favorites[c.id]) : visible), [visible, favorites, favoritesOnly]);
@@ -137,6 +140,16 @@ export function ChannelsPage({ favoritesOnly = false }: { favoritesOnly?: boolea
                 { value: "list", label: "Lista", icon: ListBulletIcon },
               ]}
             />
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={SignalIcon}
+              disabled={results.length === 0}
+              title="Comprueba si cada stream responde y ofrece eliminar los caídos"
+              onClick={() => setChecking(true)}
+            >
+              Comprobar streams
+            </Button>
           </div>
         </div>
 
@@ -195,6 +208,7 @@ export function ChannelsPage({ favoritesOnly = false }: { favoritesOnly?: boolea
           }
         />
       )}
+      <AvailabilityModal open={checking} channels={results} onClose={() => setChecking(false)} />
     </div>
   );
 }

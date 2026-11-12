@@ -1,4 +1,4 @@
-import { useState, type ButtonHTMLAttributes, type ComponentType, type ReactNode, type SVGProps } from "react";
+import { useEffect, useState, type ButtonHTMLAttributes, type ComponentType, type ReactNode, type SVGProps } from "react";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { cn } from "@/utils/cn";
 
@@ -266,4 +266,63 @@ export function Badge({ children, className }: { children: ReactNode; className?
 
 export function Skeleton({ className }: { className?: string }) {
   return <div className={cn("skeleton rounded-[10px]", className)} />;
+}
+
+/** Modal estilo Aurora: diálogo propio de la app (nunca ventanas del navegador) */
+export function Modal({
+  open,
+  onClose,
+  icon: Icon,
+  tile,
+  title,
+  subtitle,
+  children,
+  footer,
+  wide,
+}: {
+  open: boolean;
+  onClose: () => void;
+  icon?: IconType;
+  tile?: string;
+  title: string;
+  subtitle?: string;
+  children?: ReactNode;
+  footer?: ReactNode;
+  wide?: boolean;
+}) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label={title}>
+      <div className="absolute inset-0 bg-ink/45 backdrop-blur-sm anim-fade-in" aria-hidden onClick={onClose} />
+      <div
+        className={cn(
+          "relative flex max-h-[86vh] w-full flex-col overflow-hidden rounded-[10px] border border-line bg-surface shadow-card-hover anim-modal",
+          wide ? "max-w-2xl" : "max-w-lg",
+        )}
+      >
+        <header className="flex shrink-0 items-start gap-3 border-b border-line p-5">
+          {Icon && (
+            <span className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-[8px] text-white shadow-sm", tile ?? "bg-accent")}>
+              <Icon className="h-5 w-5" />
+            </span>
+          )}
+          <div className="min-w-0 flex-1">
+            <h2 className="text-lg font-bold leading-tight">{title}</h2>
+            {subtitle && <p className="mt-0.5 text-sm text-mute">{subtitle}</p>}
+          </div>
+          <IconButton icon={XMarkIcon} label="Cerrar" onClick={onClose} className="h-8 w-8" />
+        </header>
+        <div className="min-h-0 flex-1 overflow-y-auto p-5">{children}</div>
+        {footer && <footer className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-line bg-surface2/60 p-4">{footer}</footer>}
+      </div>
+    </div>
+  );
 }
